@@ -1,7 +1,6 @@
 import asyncio
 import logging
-import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict
 
@@ -17,13 +16,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 load_dotenv()
 
+
 class TrendExampleConfigGenerator(BaseStrategyConfigGenerator):
-    """
-    Strategy configuration generator for MACD and Bollinger Bands optimization.
-    """
+    """Strategy configuration generator for Trend Example optimization."""
 
     async def generate_config(self, trial) -> BacktestingConfig:
-        # Suggest hyperparameters using the trial object
         interval = trial.suggest_categorical("interval", ["1m"])
         ema_short = trial.suggest_int("ema_short", 9, 30)
         ema_medium = trial.suggest_int("ema_medium", ema_short, 70)
@@ -38,7 +35,6 @@ class TrendExampleConfigGenerator(BaseStrategyConfigGenerator):
         time_limit = 60 * 60 * 24 * 2
         cooldown_time = 60 * 15
 
-        # Create the strategy configuration
         config = TrendExampleControllerConfig(
             connector_name=self.config["connector_name"],
             trading_pair=self.config["trading_pair"],
@@ -58,16 +54,15 @@ class TrendExampleConfigGenerator(BaseStrategyConfigGenerator):
             cooldown_time=cooldown_time,
         )
 
-        # Return the configuration encapsulated in BacktestingConfig
         return BacktestingConfig(config=config, start=self.start, end=self.end)
+
 
 class TrendExampleBacktestingTask(BaseTask):
     """Backtesting task for Trend Example strategy optimization."""
-    
+
     def __init__(self, config):
         super().__init__(config)
-        
-        # Configuration with defaults
+
         task_config = self.config.config
         self.resolution = task_config.get("resolution", "1m")
         self.connector_name = task_config.get("connector_name", "binance_perpetual")
@@ -76,108 +71,108 @@ class TrendExampleBacktestingTask(BaseTask):
         self.n_trials = task_config.get("n_trials", 50)
         self.lookback_days = task_config.get("lookback_days", 30)
         self.end_time_buffer_hours = task_config.get("end_time_buffer_hours", 6)
-        
-        # Initialize optimizer (will be set up in setup)
         self.optimizer = None
 
     async def setup(self, context: TaskContext) -> None:
-        """Setup task before execution, including validation of prerequisites."""
-        # Call parent setup to initialize database and notification services
         await super().setup(context)
-        
+
         try:
-            # Validate prerequisites
             if not self.connector_name:
                 raise RuntimeError("connector_name not configured")
-                
+
             if not self.selected_pairs:
                 raise RuntimeError("selected_pairs not configured")
-            
-            # Initialize strategy optimizer (no root_path needed, uses local SQLite)
+
             self.optimizer = StrategyOptimizer(
                 resolution=self.resolution,
                 load_cached_data=True,
-                custom_backtester=DirectionalTradingBacktesting()
+                custom_backtester=DirectionalTradingBacktesting(),
             )
-            
+
             logging.info(f"Setup completed for {context.task_name}")
             logging.info(f"Connector: {self.connector_name}")
             logging.info(f"Resolution: {self.resolution}")
             logging.info(f"Trading pairs: {len(self.selected_pairs)} pairs")
             logging.info(f"Lookback days: {self.lookback_days}")
             logging.info(f"N trials: {self.n_trials}")
-            
+
         except Exception as e:
             logging.error(f"Setup failed: {e}")
             raise
-    
+
     async def cleanup(self, context: TaskContext, result) -> None:
-        """Cleanup after task execution."""
         try:
-            # No specific cleanup needed for optimizer
             logging.info(f"Cleanup completed for {context.task_name}")
         except Exception as e:
             logging.warning(f"Cleanup error: {e}")
 
     async def execute(self, context: TaskContext) -> Dict[str, Any]:
-        """Main execution logic."""
         start_execution = datetime.now(timezone.utc)
         logging.info(f"Starting Trend Example backtesting for {len(self.selected_pairs)} pairs")
-        
+
         try:
-            # Track statistics
             stats = {
                 "pairs_processed": 0,
                 "pairs_total": len(self.selected_pairs),
                 "optimizations_completed": 0,
                 "total_trials": 0,
-                "errors": 0
+                "errors": 0,
+                "study_outputs": [],
             }
 
             today_str = datetime.now().strftime("%Y-%m-%d")
-            
+
             for trading_pair in self.selected_pairs:
                 try:
-                    # Calculate time range dynamically
-                    import time
                     import pandas as pd
-                    
+                    import time
+
                     end_date = time.time() - (self.end_time_buffer_hours * 3600)
                     start_date = end_date - (self.lookback_days * 24 * 3600)
-                    
+
                     logging.info(f"Optimizing strategy for {self.connector_name} {trading_pair}")
                     logging.info(f"Time range: {pd.to_datetime(start_date, unit='s')} to {pd.to_datetime(end_date, unit='s')}")
-                    
-                    # Create config generator
+
                     config_generator = TrendExampleConfigGenerator(
                         start_date=pd.to_datetime(start_date, unit="s"),
                         end_date=pd.to_datetime(end_date, unit="s"),
                         config={
                             "connector_name": self.connector_name,
-                            "trading_pair": trading_pair
-                        }
+                            "trading_pair": trading_pair,
+                        },
                     )
-                    
-                    # Run optimization
+
                     study_name = f"{self.study_name_base}_{today_str}_{trading_pair.replace('-', '_')}"
-                    await self.optimizer.optimize(
+                    optimization_result = await self.optimizer.optimize(
                         study_name=study_name,
                         config_generator=config_generator,
-                        n_trials=self.n_trials
+                        n_trials=self.n_trials,
                     )
-                    
+
                     stats["optimizations_completed"] += 1
                     stats["total_trials"] += self.n_trials
+                    stats["study_outputs"].append(
+                        {
+                            "trading_pair": trading_pair,
+                            "study_name": study_name,
+                            "output_dir": optimization_result.output_dir,
+                            "study_trials_total": optimization_result.n_trials,
+                            "best_sharpe_ratio": optimization_result.best_trial.sharpe_ratio,
+                            "best_total_return": optimization_result.best_trial.total_return,
+                            "best_max_drawdown": optimization_result.best_trial.max_drawdown,
+                            "best_total_trades": optimization_result.best_trial.total_trades,
+                        }
+                    )
                     logging.info(f"Completed optimization for {trading_pair}")
-                    
+                    logging.info(f"Artifacts exported to: {optimization_result.output_dir}")
+
                 except Exception as e:
                     stats["errors"] += 1
                     logging.exception(f"Error optimizing {trading_pair}: {e}")
                     continue
-                
+
                 stats["pairs_processed"] += 1
-            
-            # Prepare result
+
             duration = datetime.now(timezone.utc) - start_execution
             result = {
                 "status": "completed",
@@ -187,64 +182,61 @@ class TrendExampleBacktestingTask(BaseTask):
                 "strategy": "trend_example",
                 "lookback_days": self.lookback_days,
                 "stats": stats,
-                "duration_seconds": duration.total_seconds()
+                "optimization_results": stats["study_outputs"],
+                "duration_seconds": duration.total_seconds(),
             }
-            
+
             logging.info(f"Trend Example backtesting completed: {stats}")
             return result
-            
+
         except Exception as e:
             logging.error(f"Error executing Trend Example backtesting: {e}")
             raise
-    
+
     async def on_success(self, context: TaskContext, result) -> None:
-        """Handle successful execution."""
         stats = result.result_data.get("stats", {})
-        logging.info(f"✓ TrendExampleBacktestingTask succeeded in {result.duration_seconds:.2f}s")
+        logging.info(f"TrendExampleBacktestingTask succeeded in {result.duration_seconds:.2f}s")
         logging.info(f"  - Pairs: {stats.get('pairs_processed', 0)}/{stats.get('pairs_total', 0)}")
         logging.info(f"  - Optimizations: {stats.get('optimizations_completed', 0)}")
         logging.info(f"  - Total trials: {stats.get('total_trials', 0)}")
-        if stats.get('errors', 0) > 0:
+        logging.info(f"  - Exported studies: {len(stats.get('study_outputs', []))}")
+        if stats.get("errors", 0) > 0:
             logging.warning(f"  - Errors: {stats.get('errors', 0)}")
-    
+
     async def on_failure(self, context: TaskContext, result) -> None:
-        """Handle failed execution."""
-        logging.error(f"✗ TrendExampleBacktestingTask failed: {result.error_message}")
+        logging.error(f"TrendExampleBacktestingTask failed: {result.error_message}")
         logging.error(f"  Execution ID: {context.execution_id}")
-    
+
     async def on_retry(self, context: TaskContext, attempt: int, error: Exception) -> None:
-        """Handle retry attempt."""
-        logging.warning(f"🔄 TrendExampleBacktestingTask retry attempt {attempt}: {error}")
+        logging.warning(f"TrendExampleBacktestingTask retry attempt {attempt}: {error}")
 
 
 async def main():
     """Standalone execution for testing."""
-    from core.tasks.base import TaskConfig, ScheduleConfig
-    
-    # Create v2.0 TaskConfig
+    from core.tasks.base import ScheduleConfig, TaskConfig
+
     config = TaskConfig(
         name="trend_example_backtesting_test",
         enabled=True,
         task_class="tasks.backtesting.trend_example_backtesting_task.TrendExampleBacktestingTask",
         schedule=ScheduleConfig(
             type="frequency",
-            frequency_hours=12.0
+            frequency_hours=12.0,
         ),
         config={
             "resolution": "1m",
             "connector_name": "binance_perpetual",
             "selected_pairs": ["1000BONK-USDT"],
             "study_name": "trend_example_test",
-            "n_trials": 5,  # Reduced for testing
+            "n_trials": 5,
             "lookback_days": 7,
-            "end_time_buffer_hours": 6
-        }
+            "end_time_buffer_hours": 6,
+        },
     )
-    
-    # Create and run task
+
     task = TrendExampleBacktestingTask(config)
     result = await task.run()
-    
+
     print(f"Task completed with status: {result.status}")
     if result.result_data:
         stats = result.result_data.get("stats", {})
@@ -252,7 +244,6 @@ async def main():
         print(f"Optimizations: {stats.get('optimizations_completed', 0)}")
         print(f"Total trials: {stats.get('total_trials', 0)}")
         print(f"Strategy: {result.result_data.get('strategy', 'N/A')}")
-        print(f"Time range: {result.result_data.get('time_range', 'N/A')}")
     if result.error_message:
         print(f"Error: {result.error_message}")
 

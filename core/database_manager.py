@@ -2,44 +2,53 @@
 Simple database manager for QuantsLab tasks.
 Reads database configuration from environment variables and provides shared database client instances.
 """
+import logging
 import os
 from typing import Optional
-import logging
 
 from core.services.mongodb_client import MongoClient
-# TimescaleClient removed - using parquet files for time-series data
 
 logger = logging.getLogger(__name__)
 
 
 class DatabaseManager:
     """Manages shared database connections for tasks."""
-    
+
     def __init__(self):
         self._mongodb_client: Optional[MongoClient] = None
 
+    @staticmethod
+    def get_storage_backend() -> str:
+        configured_backend = os.getenv("QUANTS_LAB_STORAGE", "").strip().lower()
+        if configured_backend:
+            return configured_backend
+        return "mongodb" if os.getenv("MONGO_URI") else "sqlite"
+
     async def get_mongodb_client(self) -> Optional[MongoClient]:
-        """Get MongoDB client instance."""
+        """Get MongoDB client instance when MongoDB storage is enabled."""
+        if self.get_storage_backend() != "mongodb":
+            logger.info("MongoDB client skipped because QUANTS_LAB_STORAGE is not set to 'mongodb'")
+            return None
+
         if self._mongodb_client is None:
-            # Use MONGO_URI from environment variables
-            mongo_uri = os.getenv('MONGO_URI')
-            mongo_database = os.getenv('MONGO_DATABASE', 'quants_lab')
-            
+            mongo_uri = os.getenv("MONGO_URI")
+            mongo_database = os.getenv("MONGO_DATABASE", "quants_lab")
+
             if not mongo_uri:
                 logger.warning("MONGO_URI environment variable not set")
                 return None
-            
+
             try:
                 self._mongodb_client = MongoClient(
                     uri=mongo_uri,
-                    database=mongo_database
+                    database=mongo_database,
                 )
                 await self._mongodb_client.connect()
                 logger.info(f"MongoDB client initialized successfully (database: {mongo_database})")
             except Exception as e:
                 logger.error(f"Failed to initialize MongoDB client: {e}")
                 return None
-                
+
         return self._mongodb_client
 
     async def cleanup(self):
@@ -49,5 +58,4 @@ class DatabaseManager:
             self._mongodb_client = None
 
 
-# Global database manager instance
 db_manager = DatabaseManager()

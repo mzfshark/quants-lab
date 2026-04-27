@@ -146,8 +146,7 @@ class DeploymentBaseTask(BaseTask):
     async def _available_bot_slots(self):
         """Check if there are available bot slots based on backend response."""
         try:
-            running_bots_data = await self.backend_api_client.get_active_bots_status()
-            active_bots_resp = running_bots_data.get("data", {})
+            active_bots_resp = await self.backend_api_client.get_active_bots_status_map()
             active_bots = [bot_name for bot_name, _ in active_bots_resp.items() if bot_name in self.active_bots.keys()]
             n_active_bots = len(active_bots)
             max_bots = self.config["deploy_params"].get("max_bots", 1)
@@ -261,8 +260,8 @@ class DeploymentBaseTask(BaseTask):
                                                                                    credentials=credentials,
                                                                                    time_to_cash_out=time_to_cash_out)
 
-        if deploy_resp["success"]:
-            instance_name = self.extract_instance_name(deploy_resp)
+        if self.backend_api_client.is_success_response(deploy_resp):
+            instance_name = self.extract_instance_name(deploy_resp) or bot_name
             logging.info(f"Successfully deployed bot instance: {instance_name}")
             started_configs = [controller_id[:-4] for controller_id in controller_configs]
             self.active_bots[instance_name] = {
@@ -271,22 +270,25 @@ class DeploymentBaseTask(BaseTask):
             }
             self.archived_configs.extend([candidate.id for candidate in final_candidates])
         else:
-            logging.error(f"There was an error trying to deploy: {deploy_resp['error']} - {deploy_resp['error']}")
+            error_message = deploy_resp.get("error") or deploy_resp.get("message") or str(deploy_resp)
+            logging.error(f"There was an error trying to deploy: {error_message}")
 
     async def _control_task(self):
         while self.running:
             try:
-                active_bots_data = await self.backend_api_client.get_active_bots_status()
-                active_bots_resp = active_bots_data["data"] or {}
+                active_bots_resp = await self.backend_api_client.get_active_bots_status_map()
                 active_bots = {bot_name: data for bot_name, data in active_bots_resp.items()
                                if bot_name in self.active_bots}
                 if len(active_bots) == 0:
                     continue
                 for bot_name, data in active_bots.items():
-                    self._control_error_logs(data["error_logs"])
-                    for controller_id, metrics in data["performance"].items():
-                        if metrics["status"] == "running":
-                            controller_info = metrics["performance"].copy()
+                    self._control_error_logs(self.backend_api_client.extract_error_logs(data))
+                    performance_map = self.backend_api_client.extract_bot_performance_map(data)
+                    for controller_id, metrics in performance_map.items():
+                        status = metrics.get("status")
+                        controller_performance = metrics.get("performance")
+                        if status == "running" and isinstance(controller_performance, dict):
+                            controller_info = controller_performance.copy()
                             controller_info["start_timestamp"] = self.active_bots[bot_name]["start_timestamp"]
                             controller_info["bot_name"] = bot_name
                             controller_info["controller_id"] = controller_id
@@ -308,7 +310,7 @@ class DeploymentBaseTask(BaseTask):
         tp_condition = global_pnl_pct >= controller_max_pnl
 
         bot_duration = time.time() - controller_info["start_timestamp"]
-        time_limit_condition = bot_duration >= self.config.get("global_time_limit", 10e10)
+        time_limit_condition = bot_duration >= self.config["control_params"].get("global_time_limit", 10e10)
 
         min_early_stop_time = self.config["control_params"].get("min_early_stop_time", 10e10)
         max_early_stop_time = self.config["control_params"].get("max_early_stop_time", 10e11)
@@ -375,6 +377,18 @@ class DeploymentBaseTask(BaseTask):
         Returns:
             str: The extracted instance name or an empty string if not found.
         """
+        for key in ("instance_name", "bot_name", "name"):
+            value = response.get(key)
+            if isinstance(value, str) and value:
+                return value
+
+        data = response.get("data")
+        if isinstance(data, dict):
+            for key in ("instance_name", "bot_name", "name"):
+                value = data.get(key)
+                if isinstance(value, str) and value:
+                    return value
+
         match = re.search(r'Instance (\S+) created successfully\.', response.get('message', ''))
         return match.group(1) if match else ""
 

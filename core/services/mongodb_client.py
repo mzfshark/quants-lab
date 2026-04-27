@@ -1,33 +1,38 @@
-import math
-from typing import List, Optional, Dict, Any, Union
 import logging
-from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Any, Dict, List, Optional, Union
+
+try:
+    from motor.motor_asyncio import AsyncIOMotorClient
+except ImportError:  # pragma: no cover - optional dependency
+    AsyncIOMotorClient = None
 
 
 class MongoClient:
     def __init__(
-            self,
-            uri: str = None,
-            database: str = "mongodb",
+        self,
+        uri: str = None,
+        database: str = "mongodb",
     ):
         self.client = None
         self.db = None
-
-        # Connection parameters with env fallbacks
         self.uri = uri
         self.database = database
 
     async def connect(self):
         """Connect to MongoDB using provided or environment variables."""
+        if AsyncIOMotorClient is None:
+            raise RuntimeError(
+                "motor is not installed. Install MongoDB dependencies or set QUANTS_LAB_STORAGE=sqlite."
+            )
+
         try:
             self.client = AsyncIOMotorClient(
                 self.uri,
-                serverSelectionTimeoutMS=5000
+                serverSelectionTimeoutMS=5000,
             )
             self.db = self.client[self.database]
-            await self.db.command('ping')
-            logging.info(f"Successfully connected to MongoDB")
-
+            await self.db.command("ping")
+            logging.info("Successfully connected to MongoDB")
         except Exception as e:
             print(f"Failed to connect to MongoDB: {str(e)}")
             raise
@@ -50,8 +55,13 @@ class MongoClient:
         await db[collection_name].drop()
         logging.info(f"Collection {collection_name} deleted from {db_name or self.db.name}.")
 
-    async def insert_documents(self, collection_name: str, documents: Union[Dict[str, Any], List[Dict[str, Any]]],
-                               db_name: Optional[str] = None, index: List[str] = []):
+    async def insert_documents(
+        self,
+        collection_name: str,
+        documents: Union[Dict[str, Any], List[Dict[str, Any]]],
+        db_name: Optional[str] = None,
+        index: List[str] = [],
+    ):
         """Insert one or multiple documents into a specified collection."""
         db = self.client[db_name] if db_name else self.db
         collection = db[collection_name]
@@ -68,8 +78,13 @@ class MongoClient:
             logging.error(f"Error inserting documents into {collection_name}: {str(e)}")
             raise
 
-    async def get_documents(self, collection_name: str, query: Dict[str, Any] = None, db_name: Optional[str] = None,
-                            limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    async def get_documents(
+        self,
+        collection_name: str,
+        query: Dict[str, Any] = None,
+        db_name: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
         """Retrieve documents from a collection with an optional query."""
         db = self.client[db_name] if db_name else self.db
         collection = db[collection_name]
@@ -96,13 +111,13 @@ class MongoClient:
         except Exception as e:
             logging.error(f"Error deleting documents from {collection_name}: {str(e)}")
             raise
-    
+
     def get_database(self, db_name: Optional[str] = None):
         """Get a database by name or return the default database."""
         if db_name:
             return self.client[db_name]
         return self.db
-    
+
     def get_collection(self, db_name: str, collection_name: str):
         """Get a collection from a specific database."""
         db = self.client[db_name] if db_name else self.db
