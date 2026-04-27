@@ -78,7 +78,9 @@
 **Links úteis**:
 - Quants-Lab API Docs: `http://localhost:8075/docs`
 - Hummingbot API Docs: `http://localhost:8000/docs`
-- Examples: `/opt/quants-lab/examples/trinity/`
+- Examples:
+  - Linux: `/opt/quants-lab/examples/trinity/`
+  - Windows: `Z:\opt\quants-lab\examples\trinity\`
 
 ---
 
@@ -118,9 +120,14 @@
 
 **Scripts úteis**:
 ```bash
-/opt/hummingbot-api/scripts/bootstrap_stack.sh
-/opt/hummingbot-api/scripts/healthcheck.sh
-/opt/hummingbot-api/scripts/validate_integrations.sh
+- Linux:
+  - `/opt/hummingbot-api/scripts/bootstrap_stack.sh`
+  - `/opt/hummingbot-api/scripts/healthcheck.sh`
+  - `/opt/hummingbot-api/scripts/validate_integrations.sh`
+- Windows:
+  - `Z:\opt\hummingbot-api\scripts\bootstrap_stack.sh`
+  - `Z:\opt\hummingbot-api\scripts\healthcheck.sh`
+  - `Z:\opt\hummingbot-api\scripts\validate_integrations.sh`
 ```
 
 ---
@@ -136,8 +143,12 @@
 
 **Tools**:
 - `python cli.py serve --api-only --port 8075`
-- Jupyter: `/opt/quants-lab/research_notebooks/`
-- Examples: `/opt/quants-lab/examples/`
+- Jupyter:
+  - Linux: `/opt/quants-lab/research_notebooks/`
+  - Windows: `Z:\opt\quants-lab\research_notebooks\`
+- Examples:
+  - Linux: `/opt/quants-lab/examples/`
+  - Windows: `Z:\opt\quants-lab\examples\`
 
 ---
 
@@ -178,7 +189,9 @@
 **Documentação**:
 - Setup: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#2-quants-lab)
 - Contracts: [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#quants-lab-api)
-- Trinity Integration: `/opt/quants-lab/docs/trinity-integration.md`
+- Trinity Integration:
+  - Linux: `/opt/quants-lab/docs/trinity-integration.md`
+  - Windows: `Z:\opt\quants-lab\docs\trinity-integration.md`
 - API Docs: `http://localhost:8075/docs`
 - GitHub: https://github.com/Axodus/quants-lab
 - Port: `8075`
@@ -232,7 +245,9 @@
 
 **Documentação**:
 - Overview: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#5-openclawtrinity-externo)
-- Integration: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+- Integration:
+  - Linux: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+  - Windows: `Z:\opt\hummingbot-api\docs\TRINITY_INTEGRATION.md`
 - Runbook: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#1️⃣-trinity-agent---runbook)
 - GitHub: https://github.com/Axodus/openclaw-trinity
 
@@ -248,8 +263,12 @@
 
 ### Integrar Trinity
 1. Ler: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#5-openclawtrinity-externo)
-2. Ler: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
-3. Ler: `/opt/quants-lab/docs/trinity-integration.md`
+2. Ler:
+   - Linux: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+   - Windows: `Z:\opt\hummingbot-api\docs\TRINITY_INTEGRATION.md`
+3. Ler:
+   - Linux: `/opt/quants-lab/docs/trinity-integration.md`
+   - Windows: `Z:\opt\quants-lab\docs\trinity-integration.md`
 4. Implementar: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-1-criação-e-deploy-de-estratégia-rápido)
 
 ### Monitorar Portfolio
@@ -314,11 +333,22 @@ Operador → /trade (Telegram)
 ## 📞 Suporte e Links
 
 ### Documentação Oficial
-- [hummingbot-api/API_REFERENCE.md](/opt/hummingbot-api/API_REFERENCE.md)
-- [hummingbot-api/docs/TRINITY_INTEGRATION.md](/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md)
-- [hummingbot-api/docs/SETUP.md](/opt/hummingbot-api/docs/SETUP.md)
-- [quants-lab/docs/trinity-integration.md](/opt/quants-lab/docs/trinity-integration.md)
-- [quants-lab/docs/axodus-trading-suite-status.md](/opt/quants-lab/docs/axodus-trading-suite-status.md)
+- Referências (paths):
+  - Hummingbot API Reference:
+    - Linux: `/opt/hummingbot-api/API_REFERENCE.md`
+    - Windows: `Z:\opt\hummingbot-api\API_REFERENCE.md`
+  - Hummingbot Trinity Integration:
+    - Linux: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+    - Windows: `Z:\opt\hummingbot-api\docs\TRINITY_INTEGRATION.md`
+  - Hummingbot Setup:
+    - Linux: `/opt/hummingbot-api/docs/SETUP.md`
+    - Windows: `Z:\opt\hummingbot-api\docs\SETUP.md`
+  - Quants-Lab Trinity Integration:
+    - Linux: `/opt/quants-lab/docs/trinity-integration.md`
+    - Windows: `Z:\opt\quants-lab\docs\trinity-integration.md`
+  - Quants-Lab Suite Status:
+    - Linux: `/opt/quants-lab/docs/axodus-trading-suite-status.md`
+    - Windows: `Z:\opt\quants-lab\docs\axodus-trading-suite-status.md`
 
 ### Endpoints Ao Vivo
 - Hummingbot API: `http://localhost:8000/docs`

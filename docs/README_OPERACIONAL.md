@@ -6,6 +6,24 @@
 
 ---
 
+## Ambiente (Linux vs Windows)
+
+Esta documentação usa, em vários pontos, paths Linux (`/opt/...`). No seu ambiente Windows, o equivalente é:
+
+- Linux: `/opt/<repo>`
+- Windows (PowerShell): `Z:\opt\<repo>`
+
+Exemplos:
+
+```text
+/opt/quants-lab        <=>  Z:\opt\quants-lab
+/opt/hummingbot-api    <=>  Z:\opt\hummingbot-api
+/opt/condor            <=>  Z:\opt\condor
+/opt/mcp-hummingbot    <=>  Z:\opt\mcp-hummingbot
+```
+
+Observação: vários scripts citados aqui são `.sh` (bash). Se você estiver operando somente via PowerShell, prefira os healthchecks via HTTP (exemplos nos guias) ou rode os `.sh` via WSL/Git-Bash.
+
 ## 🎯 O Que É Este Pacote de Documentação?
 
 Este é um **Manual Operacional Completo e Unificado** para toda a Axodus Trading Suite. Consolida documentação de integração, operação, procedures e troubleshooting de todos os componentes (Hummingbot API, Quants-Lab, Condor, MCP, Trinity).
@@ -338,11 +356,21 @@ Encontrou erro ou quer adicionar algo?
 ## 📚 Referências Externas
 
 Documentação oficial dos componentes:
-- [Hummingbot API Reference](/opt/hummingbot-api/API_REFERENCE.md)
-- [Hummingbot SETUP](/opt/hummingbot-api/docs/SETUP.md)
-- [Hummingbot Trinity Integration](/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md)
-- [Quants-Lab Trinity Integration](/opt/quants-lab/docs/trinity-integration.md)
-- [Quants-Lab Suite Status](/opt/quants-lab/docs/axodus-trading-suite-status.md)
+- Hummingbot API Reference:
+  - Linux: `/opt/hummingbot-api/API_REFERENCE.md`
+  - Windows: `Z:\opt\hummingbot-api\API_REFERENCE.md`
+- Hummingbot SETUP:
+  - Linux: `/opt/hummingbot-api/docs/SETUP.md`
+  - Windows: `Z:\opt\hummingbot-api\docs\SETUP.md`
+- Hummingbot Trinity Integration:
+  - Linux: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+  - Windows: `Z:\opt\hummingbot-api\docs\TRINITY_INTEGRATION.md`
+- Quants-Lab Trinity Integration:
+  - Linux: `/opt/quants-lab/docs/trinity-integration.md`
+  - Windows: `Z:\opt\quants-lab\docs\trinity-integration.md`
+- Quants-Lab Suite Status:
+  - Linux: `/opt/quants-lab/docs/axodus-trading-suite-status.md`
+  - Windows: `Z:\opt\quants-lab\docs\axodus-trading-suite-status.md`
 
 ---
 

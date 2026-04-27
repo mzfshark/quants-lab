@@ -91,10 +91,18 @@ flowchart LR
 - o client Trinity propriamente dito ainda precisa ser implementado no repo do OpenClaw ou no layer de integracao.
 
 **Artefatos prontos para Trinity**
-- [docs/trinity-integration.md](/opt/quants-lab/docs/trinity-integration.md)
-- [examples/trinity/strategy_manifest_macd_bb.json](/opt/quants-lab/examples/trinity/strategy_manifest_macd_bb.json)
-- [examples/trinity/backtest_request_macd_bb.json](/opt/quants-lab/examples/trinity/backtest_request_macd_bb.json)
-- [examples/trinity/optimization_request_macd_bb.json](/opt/quants-lab/examples/trinity/optimization_request_macd_bb.json)
+- `docs/trinity-integration.md`:
+  - Linux: `/opt/quants-lab/docs/trinity-integration.md`
+  - Windows: `Z:\opt\quants-lab\docs\trinity-integration.md`
+- `examples/trinity/strategy_manifest_macd_bb.json`:
+  - Linux: `/opt/quants-lab/examples/trinity/strategy_manifest_macd_bb.json`
+  - Windows: `Z:\opt\quants-lab\examples\trinity\strategy_manifest_macd_bb.json`
+- `examples/trinity/backtest_request_macd_bb.json`:
+  - Linux: `/opt/quants-lab/examples/trinity/backtest_request_macd_bb.json`
+  - Windows: `Z:\opt\quants-lab\examples\trinity\backtest_request_macd_bb.json`
+- `examples/trinity/optimization_request_macd_bb.json`:
+  - Linux: `/opt/quants-lab/examples/trinity/optimization_request_macd_bb.json`
+  - Windows: `Z:\opt\quants-lab\examples\trinity\optimization_request_macd_bb.json`
 
 ### 2. Quants-Lab
 

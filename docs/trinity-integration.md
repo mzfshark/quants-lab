@@ -10,6 +10,13 @@ Start the API without background tasks:
 python cli.py serve --api-only --port 8075
 ```
 
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\quants-lab
+python cli.py serve --api-only --port 8075
+Start-Process http://127.0.0.1:8075/docs
+```
+
 Open the interactive docs:
 
 - `http://localhost:8075/docs`
@@ -38,6 +45,13 @@ curl -X POST "http://localhost:8075/api/v1/strategies/validate" \
   --data @examples/trinity/strategy_manifest_macd_bb.json
 ```
 
+```powershell
+# (Windows / PowerShell) use curl.exe (not the PowerShell alias)
+curl.exe -X POST "http://127.0.0.1:8075/api/v1/strategies/validate" `
+  -H "Content-Type: application/json" `
+  --data "@examples/trinity/strategy_manifest_macd_bb.json"
+```
+
 ### 2. Run a single-candidate backtest
 
 `POST /api/v1/backtests`
@@ -54,6 +68,12 @@ curl -X POST "http://localhost:8075/api/v1/backtests" \
   --data @examples/trinity/backtest_request_macd_bb.json
 ```
 
+```powershell
+curl.exe -X POST "http://127.0.0.1:8075/api/v1/backtests" `
+  -H "Content-Type: application/json" `
+  --data "@examples/trinity/backtest_request_macd_bb.json"
+```
+
 ### 3. Run an optimization job
 
 `POST /api/v1/optimizations`
@@ -68,6 +88,12 @@ curl -X POST "http://localhost:8075/api/v1/optimizations" \
   --data @examples/trinity/optimization_request_macd_bb.json
 ```
 
+```powershell
+curl.exe -X POST "http://127.0.0.1:8075/api/v1/optimizations" `
+  -H "Content-Type: application/json" `
+  --data "@examples/trinity/optimization_request_macd_bb.json"
+```
+
 ### 4. Poll job status
 
 `GET /api/v1/jobs/{job_id}`
@@ -76,12 +102,22 @@ curl -X POST "http://localhost:8075/api/v1/optimizations" \
 curl "http://localhost:8075/api/v1/jobs/<job_id>"
 ```
 
+```powershell
+curl.exe "http://127.0.0.1:8075/api/v1/jobs/<job_id>"
+```
+
 ### 5. Fetch study results and report artifacts
 
 ```bash
 curl "http://localhost:8075/api/v1/studies/<study_name>"
 curl "http://localhost:8075/api/v1/reports/<study_name>"
 curl "http://localhost:8075/api/v1/approvals?study_name=<study_name>"
+```
+
+```powershell
+curl.exe "http://127.0.0.1:8075/api/v1/studies/<study_name>"
+curl.exe "http://127.0.0.1:8075/api/v1/reports/<study_name>"
+curl.exe "http://127.0.0.1:8075/api/v1/approvals?study_name=<study_name>"
 ```
 
 ## Trinity Conventions

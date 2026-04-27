@@ -122,6 +122,27 @@ cp .env.example .env.trinity  # Para Trinity externo
 # Edite os arquivos conforme necessário
 ```
 
+```powershell
+# (Windows / PowerShell) Clone repositórios
+Set-Location Z:\opt
+git clone https://github.com/Axodus/hummingbot-api.git
+git clone https://github.com/Axodus/quants-lab.git
+git clone https://github.com/Axodus/condor.git
+git clone https://github.com/Axodus/mcp-hummingbot.git mcp-hummingbot
+git clone -b master https://github.com/Axodus/Tradingbot.git
+
+# Preencha variáveis de ambiente (copiar templates)
+Set-Location Z:\opt\hummingbot-api
+Copy-Item .env.example .env.postgres
+Copy-Item .env.example .env.mqtt
+Copy-Item .env.example .env.hummingbot
+Copy-Item .env.example .env.mcp
+Copy-Item .env.example .env.condor
+Copy-Item .env.example .env.trinity  # Para Trinity externo
+
+# Edite os arquivos conforme necessário
+```
+
 ### Passo 2: Bootstrap da Stack
 
 ```bash
@@ -135,6 +156,26 @@ cd /opt/hummingbot-api
 
 # Verifica saúde
 ./scripts/healthcheck.sh
+```
+
+```powershell
+# (Windows / PowerShell) Observação:
+# A maioria dos scripts em /scripts é bash (.sh).
+# Opções:
+# 1) Rodar via WSL/Git-Bash (recomendado para quem já usa bash), OU
+# 2) Fazer healthchecks via HTTP direto (abaixo) e operar os containers via Docker.
+
+Set-Location Z:\opt\hummingbot-api
+
+# Healthchecks rápidos via HTTP (sem bash)
+curl.exe -sS http://127.0.0.1:8000/health
+curl.exe -sS http://127.0.0.1:8075/health
+curl.exe -sS http://127.0.0.1:8088/health
+
+# Swagger / OpenAPI (útil para validar que o serviço "está de pé")
+Start-Process http://127.0.0.1:8000/docs
+Start-Process http://127.0.0.1:8075/docs
+Start-Process http://127.0.0.1:8088/docs
 ```
 
 ### Passo 3: Validar Integrações
@@ -227,6 +268,20 @@ make run-tasks config=config/tf_pipeline.yml
 python cli.py --help
 ```
 
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\quants-lab
+
+# Instalação
+make install
+
+# Rodar tarefas (coleta de dados, etc)
+make run-tasks config=config/tf_pipeline.yml
+
+# Acessar CLI
+python cli.py --help
+```
+
 **Operação via API (Trinity / Agents)**:
 ```bash
 # Iniciar servidor headless (sem tarefas em background)
@@ -234,6 +289,13 @@ python cli.py serve --api-only --port 8075
 
 # Documentação interativa
 http://localhost:8075/docs
+```
+
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\quants-lab
+python cli.py serve --api-only --port 8075
+Start-Process http://127.0.0.1:8075/docs
 ```
 
 **Endpoints Principais**:
@@ -277,6 +339,20 @@ curl "http://localhost:8075/api/v1/jobs/abc123"
 **Operação**:
 ```bash
 cd /opt/condor
+
+# Instalação
+make install
+
+# Rodar localmente
+make run
+
+# Ou via Docker
+make deploy
+```
+
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\condor
 
 # Instalação
 make install
@@ -333,6 +409,17 @@ docker pull hummingbot/hummingbot-mcp:latest
 
 # Configurar em Claude Code ou Gemini
 # Adicionar config de MCP server (ver .env.example)
+```
+
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\mcp-hummingbot
+
+# Instalação (modo desenvolvimento)
+uv sync
+
+# Ou Docker (produção)
+docker pull hummingbot/hummingbot-mcp:latest
 ```
 
 **Principais MCP Tools**:
@@ -946,11 +1033,21 @@ Escalabilidade para múltiplos usuários:
 - [Tradingbot](https://github.com/Axodus/Tradingbot) - Estratégias
 
 **Documentação Oficial**:
-- [Hummingbot API Reference](/opt/hummingbot-api/API_REFERENCE.md)
-- [Hummingbot Setup Guide](/opt/hummingbot-api/docs/SETUP.md)
-- [Hummingbot Trinity Integration](/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md)
-- [Quants-Lab Trinity Integration](/opt/quants-lab/docs/trinity-integration.md)
-- [Quants-Lab Suite Status](/opt/quants-lab/docs/axodus-trading-suite-status.md)
+- Hummingbot API Reference:
+  - Linux: `/opt/hummingbot-api/API_REFERENCE.md`
+  - Windows: `Z:\opt\hummingbot-api\API_REFERENCE.md`
+- Hummingbot Setup Guide:
+  - Linux: `/opt/hummingbot-api/docs/SETUP.md`
+  - Windows: `Z:\opt\hummingbot-api\docs\SETUP.md`
+- Hummingbot Trinity Integration:
+  - Linux: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+  - Windows: `Z:\opt\hummingbot-api\docs\TRINITY_INTEGRATION.md`
+- Quants-Lab Trinity Integration:
+  - Linux: `/opt/quants-lab/docs/trinity-integration.md`
+  - Windows: `Z:\opt\quants-lab\docs\trinity-integration.md`
+- Quants-Lab Suite Status:
+  - Linux: `/opt/quants-lab/docs/axodus-trading-suite-status.md`
+  - Windows: `Z:\opt\quants-lab\docs\axodus-trading-suite-status.md`
 
 **Endpoints ao Vivo**:
 - Hummingbot Swagger: http://localhost:8000/docs

@@ -6,6 +6,14 @@
 
 ---
 
+## Nota de Ambiente (Windows)
+
+Alguns exemplos usam bash (`.sh`, `export`, `jq`, `grep`, `sqlite3`). Em Windows/PowerShell:
+
+- Variáveis de ambiente: use `$env:NOME="valor"`
+- `curl`: prefira `curl.exe` (não o alias do PowerShell)
+- Para scripts `.sh`: rode via WSL/Git-Bash, ou substitua por checks HTTP equivalentes
+
 ## 👥 Personas Operacionais
 
 ```
@@ -46,6 +54,18 @@ export QUANTS_LAB_URL="http://localhost:8075"
 export HUMMINGBOT_API_URL="http://localhost:8000"
 export HUMMINGBOT_USERNAME="admin"
 export HUMMINGBOT_PASSWORD="admin"
+```
+
+```powershell
+# (Windows / PowerShell) Verificar conectividade
+curl.exe -sS http://127.0.0.1:8075/health
+curl.exe -sS http://127.0.0.1:8000/health
+
+# Variáveis de ambiente
+$env:QUANTS_LAB_URL="http://127.0.0.1:8075"
+$env:HUMMINGBOT_API_URL="http://127.0.0.1:8000"
+$env:HUMMINGBOT_USERNAME="admin"
+$env:HUMMINGBOT_PASSWORD="admin"
 ```
 
 ---
@@ -534,6 +554,27 @@ curl http://localhost:8075/health
 curl http://localhost:8088/health
 ```
 
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\hummingbot-api
+
+# Scripts em ./scripts são bash (.sh). Se estiver sem WSL/Git-Bash, pule os .sh e valide via HTTP:
+Copy-Item .env.example .env.postgres
+Copy-Item .env.example .env.mqtt
+Copy-Item .env.example .env.hummingbot
+Copy-Item .env.example .env.mcp
+Copy-Item .env.example .env.condor
+
+# Editar arquivos com valores reais (exemplo: Notepad)
+notepad .env.hummingbot
+notepad .env.condor
+
+# Validar status via HTTP
+curl.exe -sS http://127.0.0.1:8000/health
+curl.exe -sS http://127.0.0.1:8075/health
+curl.exe -sS http://127.0.0.1:8088/health
+```
+
 ---
 
 ### Monitoring Diário
@@ -632,6 +673,28 @@ docker compose up -d
 
 # 6. Notify ops
 echo "✓ Deployment complete. All services running."
+```
+
+```powershell
+# (Windows / PowerShell)
+Set-Location Z:\opt\hummingbot-api
+
+# 1. Pull latest
+git pull origin main
+
+# 2. Stop containers
+docker compose down
+
+# 3. Rebuild images
+docker compose build --no-cache
+
+# 4. Start
+docker compose up -d
+
+# 5. Validate (HTTP)
+curl.exe -sS http://127.0.0.1:8000/health
+curl.exe -sS http://127.0.0.1:8075/health
+curl.exe -sS http://127.0.0.1:8088/health
 ```
 
 ---
