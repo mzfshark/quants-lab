@@ -1,0 +1,382 @@
+﻿# 📚 Axodus Trading Suite - Documentação Operacional Unificada
+
+**Data de Criação**: 27 de Abril de 2026  
+**Versão**: 1.0  
+**Status**: ✅ Pronto para Operação  
+
+---
+
+## 🎯 O Que É Este Pacote de Documentação?
+
+Este é um **Manual Operacional Completo e Unificado** para toda a Axodus Trading Suite. Consolida documentação de integração, operação, procedures e troubleshooting de todos os componentes (Hummingbot API, Quants-Lab, Condor, MCP, Trinity).
+
+**Objetivo**: Você e sua equipe estarem **na mesma página**, operando coordenadamente, com informação centralizada e estruturada.
+
+---
+
+## 📋 Documentos Inclusos
+
+Há **4 documentos principais**:
+
+### 1. 🔵 **AXODUS_OPERATIONAL_GUIDE.md** (COMECE AQUI)
+**Para**: Qualquer pessoa querendo entender a suite completa  
+**Tamanho**: ~1000 linhas  
+**Tempo de leitura**: 30-45 minutos
+
+**Contém**:
+- Sumário executivo
+- Arquitetura geral (diagrama visual)
+- Setup completo e passo a passo
+- Operação de cada componente
+- Fluxos de integração
+- Contratos de API (resumido)
+- Procedimentos operacionais
+- Checklist diário
+- Troubleshooting comum
+- Próximas camadas
+
+**Quando usar**: 
+- ✅ Entender a suite do zero
+- ✅ Integrar novo componente
+- ✅ Resolver problema rápido
+- ✅ Documentação de referência geral
+
+**Link**: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md)
+
+---
+
+### 2. 🟠 **AXODUS_TECHNICAL_ARCHITECTURE.md**
+**Para**: Engineers, arquitetos, integradores técnicos  
+**Tamanho**: ~900 linhas  
+**Tempo de leitura**: 1-2 horas
+
+**Contém**:
+- Arquitetura de dados (E2E)
+- Tabelas e coleções exatas (PostgreSQL, MongoDB, MQTT)
+- Contratos de API detalhados (com examples)
+- Schemas TypeScript/JSON
+- Padrões de erro e status codes
+- Sequências de integração (diagramas)
+- JWT e padrões de segurança
+
+**Quando usar**:
+- ✅ Entender exatamente como dados fluem
+- ✅ Implementar integração nova
+- ✅ Debugar em nível de API
+- ✅ Design de nova feature
+- ✅ Troubleshoot específico
+
+**Link**: [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md)
+
+---
+
+### 3. 🟢 **AXODUS_RUNBOOKS_BY_PERSONA.md**
+**Para**: Cada pessoa na equipe (veja sua persona)  
+**Tamanho**: ~800 linhas  
+**Tempo de leitura**: 15-30 minutos (por persona)
+
+**Contém runbooks passo a passo para**:
+- Trinity Agent (criar/deploy estratégias)
+- Operador de Trading (monitoramento/aprovações)
+- Engineer / DevOps (setup/troubleshooting)
+- Analista de Quant (design/backtest)
+- Admin / Governance (políticas/escalação)
+
+**Quando usar**:
+- ✅ Saber exatamente o que fazer agora
+- ✅ Procedimento passo a passo
+- ✅ Saber para quem escalar
+
+**Link**: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md)
+
+---
+
+### 4. 📋 **AXODUS_NAVIGATION.md**
+**Para**: Encontrar rápido o que você precisa  
+**Tamanho**: ~700 linhas  
+**Tempo de leitura**: 5 minutos (consulta)
+
+**Contém**:
+- Índice por persona
+- Índice por componente
+- Índice por tarefa
+- Fluxos de integração rápida
+- Busca por palavra-chave
+- Links úteis e endpoints
+
+**Quando usar**:
+- ✅ "Onde está X?"
+- ✅ "Como faço Y?"
+- ✅ Referência rápida
+
+**Link**: [AXODUS_NAVIGATION.md](AXODUS_NAVIGATION.md)
+
+---
+
+## 🚀 Quick Start - Por Persona
+
+### Sou **Trinity Agent** (AI que cria estratégias)
+→ Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#5-openclawtrinity-externo)  
+→ Depois: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#1️⃣-trinity-agent---runbook)  
+⏱️ Tempo: 20 min
+
+### Sou **Operador de Trading** (humano na frente)
+→ Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#3-condor)  
+→ Depois: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#2️⃣-operador-de-trading---runbook)  
+⏱️ Tempo: 15 min
+
+### Sou **Engineer / DevOps** (infra)
+→ Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-setup-completo)  
+→ Depois: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#3️⃣-engineer--devops---runbook)  
+⏱️ Tempo: 30 min
+
+### Sou **Analista de Quant** (estratégias)
+→ Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#2-quants-lab)  
+→ Depois: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#4️⃣-analista-de-quant---runbook)  
+⏱️ Tempo: 25 min
+
+### Sou **Admin / Governance** (política)
+→ Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-segurança-e-credenciais)  
+→ Depois: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#5️⃣-admin--governance---runbook)  
+⏱️ Tempo: 20 min
+
+---
+
+## 🗺️ Estrutura de Documentação
+
+```
+┌─────────────────────────────────────────────────────┐
+│  AXODUS_NAVIGATION.md (Índice + Busca Rápida)       │
+│  ↑                                                   │
+│  (Use para encontrar rapidamente o que precisa)     │
+└─────────────────────────────────────────────────────┘
+                        ↑
+        ┌───────────────┼───────────────┐
+        ↓               ↓               ↓
+┌──────────────────────────────────────────────────────┐
+│ AXODUS_OPERATIONAL_GUIDE.md                          │
+│ (Visão Geral + Setup + Operação + Procedures)       │
+│ ✓ Comece aqui para entender TUDO                    │
+└──────────────────────────────────────────────────────┘
+        ↓               ↓               ↓
+   ┌──────────────────────────────────────────────────────┐
+   │ AXODUS_TECHNICAL_ARCHITECTURE.md                     │
+   │ (Detalhes Técnicos + Schemas + Contratos)           │
+   │ ✓ Quando precisa de detalhes exatos                 │
+   └──────────────────────────────────────────────────────┘
+        ↓               ↓               ↓
+┌──────────────────────────────────────────────────────┐
+│ AXODUS_RUNBOOKS_BY_PERSONA.md                        │
+│ (Procedures Passo a Passo + Checklist)               │
+│ ✓ Quando precisa fazer algo AGORA                   │
+└──────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📞 Como Usar Esta Documentação
+
+### Cenário 1: "Sou novo e quero entender a suite"
+1. Leia [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md) - Seção "Sumário Executivo"
+2. Leia [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-arquitetura)
+3. Identifique sua persona
+4. Vá para [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md) para sua persona
+
+⏱️ Total: ~45 minutos
+
+---
+
+### Cenário 2: "Preciso fazer algo AGORA"
+1. Vá para [AXODUS_NAVIGATION.md](AXODUS_NAVIGATION.md#-por-tarefa)
+2. Encontre sua tarefa na lista
+3. Siga para o runbook específico
+
+⏱️ Total: 5 min (encontrar) + tempo do procedimento
+
+---
+
+### Cenário 3: "Tenho um erro / problema"
+1. Vá para [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-troubleshooting)
+2. Se não achar, vá para [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-padrões-de-erro)
+3. Se ainda não achar, procure por palavra-chave em [AXODUS_NAVIGATION.md](AXODUS_NAVIGATION.md#-busca-rápida-por-palavra-chave)
+
+⏱️ Total: 10-15 min
+
+---
+
+### Cenário 4: "Preciso entender detalhes técnicos"
+1. Vá para [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md)
+2. Procure seção relevante (API, banco de dados, schemas)
+3. Veja exemplo JSON/SQL
+
+⏱️ Total: 15-30 min (por tópico)
+
+---
+
+## 🔗 Localização dos Documentos
+
+Todos no mesmo diretório:
+
+```
+/opt/quants-lab/docs/
+├── AXODUS_OPERATIONAL_GUIDE.md          ← LEIA PRIMEIRO
+├── AXODUS_TECHNICAL_ARCHITECTURE.md     ← Detalhes técnicos
+├── AXODUS_RUNBOOKS_BY_PERSONA.md        ← Procedures
+├── AXODUS_NAVIGATION.md                 ← Índice/busca
+└── (outros documentos originais...)
+```
+
+---
+
+## 📊 Matriz de Documentação
+
+| Você Quer | Documento | Seção |
+|---|---|---|
+| Entender tudo | OPERATIONAL_GUIDE | Tudo |
+| Setup inicial | OPERATIONAL_GUIDE | Setup Completo |
+| API contracts | TECHNICAL_ARCHITECTURE | Contratos |
+| Saber o que fazer | RUNBOOKS | Sua persona |
+| Encontrar algo | NAVIGATION | Busca Rápida |
+| Troubleshoot | OPERATIONAL_GUIDE | Troubleshooting |
+
+---
+
+## ✅ Checklist: Você Está Pronto?
+
+```
+□ Leu "Sumário Executivo" de OPERATIONAL_GUIDE
+□ Entende a arquitetura básica
+□ Identificou sua persona
+□ Leu o runbook para sua persona
+□ Sabe acessar NAVIGATION quando precisar
+□ Tem links dos endpoints salvos
+□ Entende fluxos básicos de integração
+□ Sabe para quem escalar se tiver problema
+```
+
+---
+
+## 🎓 Plano de Onboarding Recomendado
+
+### Dia 1: Foundation (2-3 horas)
+- [ ] Ler "Sumário Executivo" + "Arquitetura" (OPERATIONAL_GUIDE)
+- [ ] Ler "Setup Completo" (OPERATIONAL_GUIDE)
+- [ ] Executar setup/healthcheck
+- [ ] Salvar links de endpoints
+
+### Dia 2: Sua Persona (1-2 horas)
+- [ ] Ler seção de sua persona em OPERATIONAL_GUIDE
+- [ ] Ler runbook de sua persona em RUNBOOKS
+- [ ] Executar primeira procedure da sua persona
+
+### Dia 3+: Prática
+- [ ] Executar procedures reais
+- [ ] Consultar NAVIGATION quando necessário
+- [ ] Aprofundar em TECHNICAL_ARCHITECTURE conforme necessário
+
+---
+
+## 📈 Roadmap de Documentação
+
+Esta é a **versão 1.0**. Planejamos atualizar:
+
+### Q2 2026
+- [ ] Vídeo tutorials (setup, procedures principais)
+- [ ] Diagramas interativos
+- [ ] Glossário de termos
+
+### Q3 2026
+- [ ] Casos de uso (exemplos reais de estratégias)
+- [ ] FAQ expandido
+- [ ] Documentação de troubleshooting avançado
+
+### Q4 2026
+- [ ] Integration guide para novos connectors
+- [ ] Performance tuning guide
+- [ ] Security hardening guide
+
+---
+
+## 🤝 Contribuindo para Esta Documentação
+
+Encontrou erro ou quer adicionar algo?
+
+1. **Issue no GitHub**: Abra issue em https://github.com/Axodus/quants-lab/issues
+2. **Pull Request**: Fork + edit + PR
+3. **Sugestão**: Slack #documentation
+
+**Padrão**: Todos os documentos em Markdown, português (pt-BR), formatação consistente.
+
+---
+
+## 📧 Suporte
+
+| Dúvida | Quem Contatar | Canal |
+|---|---|---|
+| Setup/infra | DevOps/Engineer | #engineering Slack |
+| Operação diária | Operador Sr. | #operations Slack |
+| Estratégias | Quant Lead | #quant Slack |
+| Policy/governance | Admin | #leadership Slack |
+| Escalação crítica | On-Call Engineer | Phone |
+
+---
+
+## 🔐 Informações Sensíveis
+
+**Atenção**: Esta documentação **não contém**:
+- ❌ Senhas ou API keys
+- ❌ Nomes de usuários real
+- ❌ Endereços privados de infra
+- ❌ Segredos comerciais
+
+**Todos os exemplos** usam `admin`, `localhost`, valores de teste.
+
+**Credenciais reais**: Usar `.env` files (fora de versionamento)
+
+---
+
+## 📚 Referências Externas
+
+Documentação oficial dos componentes:
+- [Hummingbot API Reference](/opt/hummingbot-api/API_REFERENCE.md)
+- [Hummingbot SETUP](/opt/hummingbot-api/docs/SETUP.md)
+- [Hummingbot Trinity Integration](/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md)
+- [Quants-Lab Trinity Integration](/opt/quants-lab/docs/trinity-integration.md)
+- [Quants-Lab Suite Status](/opt/quants-lab/docs/axodus-trading-suite-status.md)
+
+---
+
+## 🎯 Seu Próximo Passo
+
+**Se é novo na suite**:
+→ Vá para [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md) e comece pelo "Sumário Executivo"
+
+**Se já conhece parcialmente**:
+→ Vá para [AXODUS_NAVIGATION.md](AXODUS_NAVIGATION.md) e procure sua tarefa
+
+**Se é engineer/tech**:
+→ Vá para [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md)
+
+**Se precisa fazer algo agora**:
+→ Vá para [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md) e encontre sua persona
+
+---
+
+## 📄 Versão e Histórico
+
+| Versão | Data | Status | Mudanças |
+|---|---|---|---|
+| 1.0 | 27/04/2026 | ✅ Pronto | Consolidação inicial de toda documentação |
+
+---
+
+## 📝 Footers
+
+**Documentação Criada**: 27 de Abril de 2026  
+**Última Atualização**: 27 de Abril de 2026  
+**Manutenção**: Axodus Engineering  
+**Status**: ✅ Pronto para Operação  
+
+---
+
+**Bem-vindo à Axodus Trading Suite. Você agora tem toda a informação para operar coordenadamente! 🚀**

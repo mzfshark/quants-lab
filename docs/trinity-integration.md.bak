@@ -1,4 +1,4 @@
-﻿# Trinity Integration Guide
+# Trinity Integration Guide
 
 Quants-Lab exposes a headless API that Trinity can use as a strategy validation, backtesting, and optimization engine.
 

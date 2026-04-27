@@ -1,0 +1,465 @@
+# Axodus Trading Suite - Índice e Navegação
+
+**Data**: Abril 2026  
+**Versão**: 1.0  
+**Propósito**: Mapa de documentação. Ajuda você a encontrar o que precisa rápido.
+
+---
+
+## 🗺️ Mapa de Documentação Unificado
+
+```
+📚 Documentação Axodus
+├── 🔵 AXODUS_OPERATIONAL_GUIDE.md
+│   └── Comece aqui para entender a suite completa
+│       ├─ Sumário executivo
+│       ├─ Arquitetura geral
+│       ├─ Setup completo
+│       ├─ Operação de cada componente
+│       ├─ Fluxos de integração
+│       ├─ Checklist diário
+│       └─ Troubleshooting
+│
+├── 🟠 AXODUS_TECHNICAL_ARCHITECTURE.md
+│   └── Detalhes técnicos para engineers
+│       ├─ Arquitetura de dados (E2E)
+│       ├─ Tabelas e coleções (PostgreSQL, MongoDB)
+│       ├─ Contratos de API (detalhados)
+│       ├─ Padrões de erro
+│       ├─ Schemas principais
+│       └─ Sequências de integração
+│
+├── 🟢 AXODUS_RUNBOOKS_BY_PERSONA.md
+│   └── Procedures passo a passo por role
+│       ├─ Trinity Agent
+│       ├─ Operador de Trading
+│       ├─ Engineer / DevOps
+│       ├─ Analista de Quant
+│       ├─ Admin / Governance
+│       └─ Matriz de escalação
+│
+└── 📋 AXODUS_NAVIGATION.md (este arquivo)
+    └── Índice e quick reference
+```
+
+---
+
+## 🚀 Comece Aqui - Quick Start
+
+### Sou novo na suite, por onde começo?
+
+1. Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-sumário-executivo) - Seção "Sumário Executivo" (5 min)
+2. Leia: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-arquitetura) - Seção "Arquitetura" (10 min)
+3. Vá para sua persona abaixo ↓
+
+### Estou com problema agora
+
+1. Procure em [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-troubleshooting) - Troubleshooting
+2. Se não achar, procure em [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-padrões-de-erro) - Padrões de Erro
+
+### Preciso fazer algo (uma ação)
+
+→ Vá para [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md) e encontre sua persona
+
+---
+
+## 👥 Por Persona
+
+### Você é: Trinity Agent (AI)
+
+**Objetivo**: Criar, testar e deploy de estratégias automaticamente
+
+**Leia em ordem**:
+1. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#5-openclawtrinity-externo) - Seção OpenClaw Trinity
+2. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-contratos-de-api-unificados) - Contratos de API
+3. [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#quants-lab-api) - Quants-Lab API (detalhes)
+4. [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#1️⃣-trinity-agent---runbook) - Trinity Runbook
+
+**Links úteis**:
+- Quants-Lab API Docs: `http://localhost:8075/docs`
+- Hummingbot API Docs: `http://localhost:8000/docs`
+- Examples: `/opt/quants-lab/examples/trinity/`
+
+---
+
+### Você é: Operador de Trading
+
+**Objetivo**: Monitorar, aprovar estratégias, executar trades manualmente
+
+**Leia em ordem**:
+1. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#3-condor) - Seção Condor
+2. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-fluxos-de-integração) - Fluxos de Integração
+3. [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#2️⃣-operador-de-trading---runbook) - Operador Runbook
+
+**Comandos do Telegram**:
+```
+/portfolio   → Ver saldo e PnL
+/bots        → Ver bots ativos
+/trade       → Colocar ordem manual
+/swap        → DEX swap
+/config      → Configurar
+```
+
+**Links úteis**:
+- Condor Docs: `http://localhost:8088/docs`
+- Quants-Lab Approvals: `http://localhost:8075/api/v1/approvals`
+
+---
+
+### Você é: Engineer / DevOps
+
+**Objetivo**: Setup, deploy, monitoring, troubleshooting
+
+**Leia em ordem**:
+1. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-setup-completo) - Setup Completo
+2. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-troubleshooting) - Troubleshooting
+3. [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-arquitetura-de-dados) - Arquitetura de Dados
+4. [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#3️⃣-engineer--devops---runbook) - Engineer Runbook
+
+**Scripts úteis**:
+```bash
+/opt/hummingbot-api/scripts/bootstrap_stack.sh
+/opt/hummingbot-api/scripts/healthcheck.sh
+/opt/hummingbot-api/scripts/validate_integrations.sh
+```
+
+---
+
+### Você é: Analista de Quant
+
+**Objetivo**: Design, teste e validação de controllers e estratégias
+
+**Leia em ordem**:
+1. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#2-quants-lab) - Seção Quants-Lab
+2. [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#quants-lab-api) - Quants-Lab API
+3. [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#4️⃣-analista-de-quant---runbook) - Quant Runbook
+
+**Tools**:
+- `python cli.py serve --api-only --port 8075`
+- Jupyter: `/opt/quants-lab/research_notebooks/`
+- Examples: `/opt/quants-lab/examples/`
+
+---
+
+### Você é: Admin / Governance
+
+**Objetivo**: Políticas, compliance, aprovações críticas
+
+**Leia em ordem**:
+1. [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-procedimentos-operacionais) - Procedures
+2. [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#5️⃣-admin--governance---runbook) - Admin Runbook
+
+---
+
+## 🔌 Por Componente
+
+### Hummingbot API
+**Propósito**: Runtime de trading, account management, executores
+
+**Documentação**:
+- Setup: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#1-hummingbot-api)
+- Contracts: [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#hummingbot-api)
+- API Docs: `http://localhost:8000/docs`
+- GitHub: https://github.com/Axodus/hummingbot-api
+- Port: `8000`
+
+**Endpoints principais**:
+- `GET /health` - Health check
+- `GET /accounts/` - Listar accounts
+- `POST /market-data/candles` - Candles
+- `POST /trading/orders` - Colocar ordem
+- `GET /portfolio/state` - Portfolio
+
+---
+
+### Quants-Lab
+**Propósito**: Backtesting, otimização, relatórios, aprovações
+
+**Documentação**:
+- Setup: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#2-quants-lab)
+- Contracts: [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#quants-lab-api)
+- Trinity Integration: `/opt/quants-lab/docs/trinity-integration.md`
+- API Docs: `http://localhost:8075/docs`
+- GitHub: https://github.com/Axodus/quants-lab
+- Port: `8075`
+
+**Endpoints principais**:
+- `POST /api/v1/strategies/validate` - Validar manifesto
+- `POST /api/v1/backtests` - Rodar backtest
+- `POST /api/v1/optimizations` - Rodar otimização
+- `GET /api/v1/jobs/{job_id}` - Poll status
+- `GET /api/v1/reports/{study_name}` - Fetch relatório
+- `GET /api/v1/approvals` - Listar approvals
+
+---
+
+### Condor
+**Propósito**: Interface Telegram, monitoramento, trading manual
+
+**Documentação**:
+- Setup: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#3-condor)
+- API Docs: `http://localhost:8088/docs`
+- GitHub: https://github.com/Axodus/condor
+- Port: `8088`
+
+**Principais features**:
+- `/portfolio` - Dashboard PnL
+- `/bots` - Status de bots
+- `/trade` - CEX trading
+- `/swap` - DEX swap
+- `/config` - Configuração
+
+---
+
+### MCP Hummingbot
+**Propósito**: AI integration via Model Context Protocol
+
+**Documentação**:
+- Setup: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#4-mcp-hummingbot)
+- GitHub: https://github.com/Axodus/mcp-hummingbot
+- Port: `3000` (MCP HTTP)
+
+**Principais tools**:
+- `configure_api_servers()` - Configurar conexão
+- `get_portfolio_overview()` - Portfolio unificado
+- `place_order()` - Colocar ordem
+- `search_history()` - Histórico de trades
+
+---
+
+### OpenClaw Trinity
+**Propósito**: Agent de orquestração e criação de estratégias
+
+**Documentação**:
+- Overview: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#5-openclawtrinity-externo)
+- Integration: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+- Runbook: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#1️⃣-trinity-agent---runbook)
+- GitHub: https://github.com/Axodus/openclaw-trinity
+
+---
+
+## 📋 Por Tarefa
+
+### Setup Inicial
+1. Validar pré-requisitos: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#pré-requisitos)
+2. Preencher environment: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#passo-1-ambiente)
+3. Bootstrap: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#passo-2-bootstrap-da-stack)
+4. Validar integrações: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#passo-3-validar-integrações)
+
+### Integrar Trinity
+1. Ler: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#5-openclawtrinity-externo)
+2. Ler: `/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md`
+3. Ler: `/opt/quants-lab/docs/trinity-integration.md`
+4. Implementar: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-1-criação-e-deploy-de-estratégia-rápido)
+
+### Monitorar Portfolio
+1. Usar Telegram: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#via-telegram-condor)
+2. Ou API: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#via-api-1)
+
+### Aprovar Estratégia
+1. Ler: [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-aprovar-estratégia)
+2. Revisar relatório
+3. Decidir APPROVE/REJECT
+
+### Troubleshoot API
+1. Verificar status: [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-troubleshooting)
+2. Ler logs: `docker compose logs -f <service>`
+3. Ler error codes: [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-padrões-de-erro)
+
+---
+
+## 🔗 Integração Rápida
+
+### Trinity ← → Quants-Lab
+
+**Fluxo**:
+```
+Trinity → POST /api/v1/strategies/validate → Validar
+       → POST /api/v1/backtests → Rodar teste
+       → POST /api/v1/optimizations → Rodar otimização
+       → GET /api/v1/jobs/{id} → Poll status
+       → GET /api/v1/reports/{name} → Ler resultados
+```
+
+**Docs**:
+- [Operação](AXODUS_OPERATIONAL_GUIDE.md#-contratos-de-api-unificados)
+- [Technical](AXODUS_TECHNICAL_ARCHITECTURE.md#quants-lab-api)
+
+### Quants-Lab ← → Hummingbot API
+
+**Fluxo**:
+```
+Quants-Lab → Deploy approved strategy
+          → POST /executors/ → Criar executor
+          → Monitor via GET /portfolio/state
+```
+
+**Docs**:
+- [Operação](AXODUS_OPERATIONAL_GUIDE.md#fluxo-2-trinity-→-otimização-→-aprovação-→-deploy)
+
+### Operador ← → Hummingbot API
+
+**Fluxo**:
+```
+Operador → /trade (Telegram)
+        → Condor → POST /trading/orders
+        → Hummingbot API executa
+```
+
+**Docs**:
+- [Runbook](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-executar-trade-manual)
+
+---
+
+## 📞 Suporte e Links
+
+### Documentação Oficial
+- [hummingbot-api/API_REFERENCE.md](/opt/hummingbot-api/API_REFERENCE.md)
+- [hummingbot-api/docs/TRINITY_INTEGRATION.md](/opt/hummingbot-api/docs/TRINITY_INTEGRATION.md)
+- [hummingbot-api/docs/SETUP.md](/opt/hummingbot-api/docs/SETUP.md)
+- [quants-lab/docs/trinity-integration.md](/opt/quants-lab/docs/trinity-integration.md)
+- [quants-lab/docs/axodus-trading-suite-status.md](/opt/quants-lab/docs/axodus-trading-suite-status.md)
+
+### Endpoints Ao Vivo
+- Hummingbot API: `http://localhost:8000/docs`
+- Quants-Lab API: `http://localhost:8075/docs`
+- Condor API: `http://localhost:8088/docs`
+- EMQX Dashboard: `http://localhost:18083` (admin/public)
+
+### Repositórios GitHub
+- hummingbot-api: https://github.com/Axodus/hummingbot-api
+- quants-lab: https://github.com/Axodus/quants-lab
+- condor: https://github.com/Axodus/condor
+- mcp-hummingbot: https://github.com/Axodus/mcp-hummingbot
+- Tradingbot: https://github.com/Axodus/Tradingbot
+
+---
+
+## 🎯 Busca Rápida por Palavra-Chave
+
+### A
+- **API Contracts** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-contratos-de-api-detalhados)
+- **Approval Decision** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-aprovar-estratégia)
+- **Arquitetura** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-arquitetura)
+
+### B
+- **Backtest** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#passo-3-rodar-otimização)
+- **Bootstrap** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#passo-2-bootstrap-da-stack)
+- **Backup** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#backup-and-restore)
+
+### C
+- **Checklist** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-checklist-de-operação-diária)
+- **Contracts** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-contratos-de-api-detalhados)
+- **Credenciais** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-padrões-de-segurança)
+
+### D
+- **Deploy** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#passo-5-deploy-se-aprovado)
+- **Database** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-arquitetura-de-dados)
+
+### E
+- **Endpoints** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#📡-operação-por-componente)
+- **Error Handling** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-padrões-de-erro)
+
+### H
+- **Health Check** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#passo-3-validar-integrações)
+- **Hummingbot API** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#1-hummingbot-api)
+
+### J
+- **Jobs** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#passo-3-rodar-otimização)
+
+### L
+- **Logs** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#logs-centralizados)
+
+### M
+- **Manifesto** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#strategymanifest)
+- **MCP** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#4-mcp-hummingbot)
+- **Monitoring** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-monitoramento-e-observabilidade)
+
+### O
+- **Optimization** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#passo-3-rodar-otimização)
+- **Operacional** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md)
+
+### P
+- **Portfolio** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-executar-trade-manual)
+- **Procedimentos** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-procedimentos-operacionais)
+
+### Q
+- **Quants-Lab** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#2-quants-lab)
+
+### R
+- **Reports** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#passo-4-ler-relatório-e-aprovação)
+- **Runbooks** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md)
+
+### S
+- **Setup** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-setup-completo)
+- **Schemas** → [AXODUS_TECHNICAL_ARCHITECTURE.md](AXODUS_TECHNICAL_ARCHITECTURE.md#-schemas-principais)
+- **Segurança** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-segurança-e-credenciais)
+
+### T
+- **Telegram** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#via-telegram-condor)
+- **Trading** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#fluxo-executar-trade-manual)
+- **Trinity** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#1️⃣-trinity-agent---runbook)
+- **Troubleshooting** → [AXODUS_OPERATIONAL_GUIDE.md](AXODUS_OPERATIONAL_GUIDE.md#-troubleshooting)
+
+### V
+- **Validação** → [AXODUS_RUNBOOKS_BY_PERSONA.md](AXODUS_RUNBOOKS_BY_PERSONA.md#passo-2-construir-manifesto)
+
+---
+
+## 📈 Fluxos por Duração
+
+### < 5 minutos
+- Health check: `./scripts/healthcheck.sh`
+- Ver portfolio: `/portfolio` no Telegram
+- Check API status: `curl http://localhost:8000/health`
+
+### 10-30 minutos
+- Deploy estratégia simples (backtest rápido)
+- Aprovar strategy candidate
+- Trade manual via Condor
+
+### 1-24 horas
+- Otimização completa (100 trials)
+- Análise e relatório
+- Integração de novo controller
+
+### Semanal
+- Análise de performance
+- Ajuste de policies
+- Auditoria de aprovações
+
+### Mensal
+- Relatório executivo
+- Revisão de governance
+- Atualização de documentation
+
+---
+
+## ✅ Checklist: Tudo Configurado?
+
+```
+□ Environment variables preenchidas (.env.*)
+□ Docker containers rodando
+□ Healthcheck passando
+□ Integrations validando
+□ Trinity conectando a Quants-Lab
+□ Operador conseguindo via Telegram
+□ Approvals workflow testado
+□ Backup e restore funcionando
+□ Documentação lida e entendida
+```
+
+---
+
+## 🆘 Preciso de Ajuda?
+
+1. **Não encontra a resposta?** → Procure por palavra-chave acima
+2. **Erro específico?** → Vá para [Troubleshooting](AXODUS_OPERATIONAL_GUIDE.md#-troubleshooting)
+3. **Dúvida estratégica?** → Vá para [Governance](AXODUS_RUNBOOKS_BY_PERSONA.md#5️⃣-admin--governance---runbook)
+4. **Problema técnico?** → Vá para [Engineer Runbook](AXODUS_RUNBOOKS_BY_PERSONA.md#3️⃣-engineer--devops---runbook)
+
+---
+
+**Versão**: 1.0  
+**Última Atualização**: 27/04/2026  
+**Manutenção**: Atualizar quando novos documentos forem adicionados
