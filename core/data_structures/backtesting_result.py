@@ -47,8 +47,33 @@ Close Types: Take Profit: {take_profit} | Stop Loss: {stop_loss} | Time Limit: {
 
     @property
     def executors_df(self):
-        executors_df = pd.DataFrame([e.dict() for e in self.executors])
-        executors_df["side"] = executors_df["config"].apply(lambda x: x["side"].name)
+        rows = []
+        for executor in self.executors:
+            if hasattr(executor, "model_dump"):
+                rows.append(executor.model_dump(mode="json"))
+            elif hasattr(executor, "dict"):
+                rows.append(executor.dict())
+            elif isinstance(executor, dict):
+                rows.append(executor)
+            else:
+                rows.append(vars(executor))
+
+        executors_df = pd.DataFrame(rows)
+        if executors_df.empty:
+            return executors_df
+
+        if "config" in executors_df.columns and "side" not in executors_df.columns:
+            executors_df["side"] = executors_df["config"].apply(
+                lambda value: (
+                    value.get("side").name
+                    if isinstance(value, dict) and hasattr(value.get("side"), "name")
+                    else value.get("side")
+                    if isinstance(value, dict)
+                    else None
+                )
+            )
+        elif "side" in executors_df.columns:
+            executors_df["side"] = executors_df["side"].apply(lambda value: value.name if hasattr(value, "name") else value)
         return executors_df
 
     def _get_bt_candlestick_trace(self):

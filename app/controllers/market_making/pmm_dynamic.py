@@ -5,6 +5,7 @@ import pandas_ta as ta  # noqa: F401
 from pydantic import Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
+from app.controllers.ta_helpers import macd_name_candidates, resolve_indicator_column
 from hummingbot.data_feed.candles_feed.data_types import CandlesConfig
 from hummingbot.strategy_v2.controllers.market_making_controller_base import (
     MarketMakingControllerBase,
@@ -96,9 +97,29 @@ class PMMDynamicController(MarketMakingControllerBase):
         natr = ta.natr(candles["high"], candles["low"], candles["close"], length=self.config.natr_length) / 100
         macd_output = ta.macd(candles["close"], fast=self.config.macd_fast,
                               slow=self.config.macd_slow, signal=self.config.macd_signal)
-        macd = macd_output[f"MACD_{self.config.macd_fast}_{self.config.macd_slow}_{self.config.macd_signal}"]
+        macd_column = resolve_indicator_column(
+            macd_output,
+            exact_names=macd_name_candidates(
+                "MACD",
+                self.config.macd_fast,
+                self.config.macd_slow,
+                self.config.macd_signal,
+            ),
+            prefix="MACD_",
+        )
+        macdh_column = resolve_indicator_column(
+            macd_output,
+            exact_names=macd_name_candidates(
+                "MACDh",
+                self.config.macd_fast,
+                self.config.macd_slow,
+                self.config.macd_signal,
+            ),
+            prefix="MACDh_",
+        )
+        macd = macd_output[macd_column]
         macd_signal = - (macd - macd.mean()) / macd.std()
-        macdh = macd_output[f"MACDh_{self.config.macd_fast}_{self.config.macd_slow}_{self.config.macd_signal}"]
+        macdh = macd_output[macdh_column]
         macdh_signal = macdh.apply(lambda x: 1 if x > 0 else -1)
         max_price_shift = natr / 2
         price_multiplier = ((0.5 * macd_signal + 0.5 * macdh_signal) * max_price_shift).iloc[-1]

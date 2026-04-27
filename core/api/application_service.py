@@ -414,6 +414,16 @@ class TrinityExecutionService:
         return report.model_dump(mode="json")
 
     def _ensure_report_bundle(self, result_model, approval_request: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        if not result_model.output_dir:
+            optimizer = StrategyOptimizer()
+            refreshed_result = optimizer.export_optimization_result(
+                result_model.study_name,
+                top_k=max(5, len(result_model.top_k_trials)),
+            )
+            result_model.output_dir = refreshed_result.output_dir
+            if not result_model.metadata:
+                result_model.metadata = refreshed_result.metadata
+
         artifact_paths = result_model.metadata.get("report_artifacts") or {}
         summary_markdown = artifact_paths.get("summary_markdown")
         if summary_markdown and Path(summary_markdown).exists():
@@ -506,8 +516,10 @@ class TrinityExecutionService:
 
     @staticmethod
     def _serialize_controller_config(controller_config: Any) -> Dict[str, Any]:
+        if hasattr(controller_config, "model_dump"):
+            return controller_config.model_dump(mode="json", warnings="none")
         if hasattr(controller_config, "model_dump_json"):
-            return json.loads(controller_config.model_dump_json())
+            return json.loads(controller_config.model_dump_json(warnings="none"))
         if hasattr(controller_config, "json"):
             return json.loads(controller_config.json())
         if hasattr(controller_config, "dict"):

@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 import pandas_ta as ta  # noqa: F401
 from pydantic import Field, validator
 
+from app.controllers.ta_helpers import append_symmetric_bbands, resolve_indicator_column
 from hummingbot.client.config.config_data_types import ClientFieldData
 from hummingbot.core.data_type.common import TradeType
 from hummingbot.data_feed.candles_feed.data_types import CandlesConfig
@@ -193,11 +194,19 @@ class XtreetBBController(DirectionalTradingControllerBase):
                                                       interval=self.config.interval,
                                                       max_records=self.max_records)
         # Add indicators
-        df.ta.bbands(length=self.config.bb_length, std=self.config.bb_std, append=True)
+        append_symmetric_bbands(df, length=self.config.bb_length, std=self.config.bb_std)
+        bbp_column = resolve_indicator_column(
+            df,
+            exact_names=[
+                f"BBP_{self.config.bb_length}_{self.config.bb_std}",
+                f"BBP_{self.config.bb_length}_{self.config.bb_std}_{self.config.bb_std}",
+            ],
+            prefix=f"BBP_{self.config.bb_length}_",
+        )
 
         # Generate signal
-        long_condition = df[f"BBP_{self.config.bb_length}_{self.config.bb_std}"] < self.config.bb_long_threshold
-        short_condition = df[f"BBP_{self.config.bb_length}_{self.config.bb_std}"] > self.config.bb_short_threshold
+        long_condition = df[bbp_column] < self.config.bb_long_threshold
+        short_condition = df[bbp_column] > self.config.bb_short_threshold
 
         # Generate signal
         df["signal"] = 0
@@ -226,7 +235,15 @@ class XtreetBBController(DirectionalTradingControllerBase):
     def get_spread_multiplier(self) -> Decimal:
         if self.config.dynamic_order_spread:
             df = self.processed_data["features"]
-            bb_width = df[f"BBB_{self.config.bb_length}_{self.config.bb_std}"].iloc[-1]
+            bbb_column = resolve_indicator_column(
+                df,
+                exact_names=[
+                    f"BBB_{self.config.bb_length}_{self.config.bb_std}",
+                    f"BBB_{self.config.bb_length}_{self.config.bb_std}_{self.config.bb_std}",
+                ],
+                prefix=f"BBB_{self.config.bb_length}_",
+            )
+            bb_width = df[bbb_column].iloc[-1]
             return Decimal(bb_width / 200)
         else:
             return Decimal("1.0")

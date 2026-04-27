@@ -271,8 +271,10 @@ class StrategyOptimizer:
         trial.set_user_attr("executors", executors_df.to_json())
 
     def _serialize_controller_config(self, controller_config: ControllerConfigBase) -> Dict[str, Any]:
+        if hasattr(controller_config, "model_dump"):
+            return controller_config.model_dump(mode="json", warnings="none")
         if hasattr(controller_config, "model_dump_json"):
-            return json.loads(controller_config.model_dump_json())
+            return json.loads(controller_config.model_dump_json(warnings="none"))
         if hasattr(controller_config, "json"):
             return json.loads(controller_config.json())
         if hasattr(controller_config, "dict"):

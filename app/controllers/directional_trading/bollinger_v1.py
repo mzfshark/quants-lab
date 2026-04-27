@@ -4,6 +4,7 @@ import pandas_ta as ta  # noqa: F401
 from pydantic import Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
+from app.controllers.ta_helpers import append_symmetric_bbands, resolve_indicator_column
 from hummingbot.data_feed.candles_feed.data_types import CandlesConfig
 from hummingbot.strategy_v2.controllers.directional_trading_controller_base import (
     DirectionalTradingControllerBase,
@@ -70,8 +71,16 @@ class BollingerV1Controller(DirectionalTradingControllerBase):
                                                       interval=self.config.interval,
                                                       max_records=self.max_records)
         # Add indicators
-        df.ta.bbands(length=self.config.bb_length, std=self.config.bb_std, append=True)
-        bbp = df[f"BBP_{self.config.bb_length}_{self.config.bb_std}"]
+        append_symmetric_bbands(df, length=self.config.bb_length, std=self.config.bb_std)
+        bbp_column = resolve_indicator_column(
+            df,
+            exact_names=[
+                f"BBP_{self.config.bb_length}_{self.config.bb_std}",
+                f"BBP_{self.config.bb_length}_{self.config.bb_std}_{self.config.bb_std}",
+            ],
+            prefix=f"BBP_{self.config.bb_length}_",
+        )
+        bbp = df[bbp_column]
 
         # Generate signal
         long_condition = bbp < self.config.bb_long_threshold

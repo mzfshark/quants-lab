@@ -450,15 +450,24 @@ def _load_result_from_artifacts(study_name: str):
     return manager.load_latest_result(study_name)
 
 
-def _load_result_for_study(study_name: str, top_k: int, refresh_from_study: bool = False):
+def _load_result_for_study(
+    study_name: str,
+    top_k: int,
+    refresh_from_study: bool = False,
+    require_output_dir: bool = False,
+):
     cached_result = _load_result_from_artifacts(study_name)
-    if cached_result is not None and len(cached_result.top_k_trials) >= max(1, top_k):
+    if (
+        cached_result is not None
+        and len(cached_result.top_k_trials) >= max(1, top_k)
+        and (not require_output_dir or bool(cached_result.output_dir))
+    ):
         return cached_result
 
     from core.backtesting.optimizer import StrategyOptimizer
 
     optimizer = StrategyOptimizer()
-    if refresh_from_study:
+    if refresh_from_study or require_output_dir:
         return optimizer.export_optimization_result(study_name, top_k=max(1, top_k))
     return optimizer.build_optimization_result(study_name, top_k=max(1, top_k))
 
@@ -522,7 +531,7 @@ def show_report(study_name: str, as_json: bool = False):
     from core.condor.approval_manager import ApprovalManager
     from core.reporting.optimization_reporter import OptimizationReporter
 
-    result = _load_result_for_study(study_name, top_k=3, refresh_from_study=False)
+    result = _load_result_for_study(study_name, top_k=3, refresh_from_study=False, require_output_dir=True)
     approval_manager = ApprovalManager()
     approval_request = result.metadata.get("approval_request")
     if approval_request is None:

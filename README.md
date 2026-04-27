@@ -83,6 +83,30 @@ Quants-Lab does not ship with a dedicated product-style web dashboard yet. The c
 
 So yes, there is already a lightweight web-access path via FastAPI `/docs`, but there is not yet a dedicated operations dashboard for strategies, approvals, reports, and deployments.
 
+## Trinity API Contract
+
+Quants-Lab can now act as a headless strategy engine for external agents such as OpenClaw Trinity.
+
+- Axodus suite map and status: `docs/axodus-trading-suite-status.md`
+- Integration guide: `docs/trinity-integration.md`
+- Canonical manifest example: `examples/trinity/strategy_manifest_macd_bb.json`
+- Backtest request example: `examples/trinity/backtest_request_macd_bb.json`
+- Optimization request example: `examples/trinity/optimization_request_macd_bb.json`
+
+Recommended launch mode for agent integrations:
+
+```bash
+python cli.py serve --api-only --port 8075
+```
+
+Then use:
+
+- `POST /api/v1/strategies/validate`
+- `POST /api/v1/backtests`
+- `POST /api/v1/optimizations`
+- `GET /api/v1/jobs/{job_id}`
+- `GET /api/v1/reports/{study_name}`
+
 ## Can It Be Extended To A Real Web UI?
 
 Yes. The current architecture is already a good base for that because it has:

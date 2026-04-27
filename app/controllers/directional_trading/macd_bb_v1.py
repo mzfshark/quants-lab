@@ -4,6 +4,7 @@ import pandas_ta as ta  # noqa: F401
 from pydantic import Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
+from app.controllers.ta_helpers import append_symmetric_bbands, macd_name_candidates, resolve_indicator_column
 from hummingbot.data_feed.candles_feed.data_types import CandlesConfig
 from hummingbot.strategy_v2.controllers.directional_trading_controller_base import (
     DirectionalTradingControllerBase,
@@ -80,12 +81,40 @@ class MACDBBV1Controller(DirectionalTradingControllerBase):
                                                       interval=self.config.interval,
                                                       max_records=self.max_records)
         # Add indicators
-        df.ta.bbands(length=self.config.bb_length, std=self.config.bb_std, append=True)
+        append_symmetric_bbands(df, length=self.config.bb_length, std=self.config.bb_std)
         df.ta.macd(fast=self.config.macd_fast, slow=self.config.macd_slow, signal=self.config.macd_signal, append=True)
 
-        bbp = df[f"BBP_{self.config.bb_length}_{self.config.bb_std}"]
-        macdh = df[f"MACDh_{self.config.macd_fast}_{self.config.macd_slow}_{self.config.macd_signal}"]
-        macd = df[f"MACD_{self.config.macd_fast}_{self.config.macd_slow}_{self.config.macd_signal}"]
+        bbp_column = resolve_indicator_column(
+            df,
+            exact_names=[
+                f"BBP_{self.config.bb_length}_{self.config.bb_std}",
+                f"BBP_{self.config.bb_length}_{self.config.bb_std}_{self.config.bb_std}",
+            ],
+            prefix=f"BBP_{self.config.bb_length}_",
+        )
+        bbp = df[bbp_column]
+        macdh_column = resolve_indicator_column(
+            df,
+            exact_names=macd_name_candidates(
+                "MACDh",
+                self.config.macd_fast,
+                self.config.macd_slow,
+                self.config.macd_signal,
+            ),
+            prefix="MACDh_",
+        )
+        macd_column = resolve_indicator_column(
+            df,
+            exact_names=macd_name_candidates(
+                "MACD",
+                self.config.macd_fast,
+                self.config.macd_slow,
+                self.config.macd_signal,
+            ),
+            prefix="MACD_",
+        )
+        macdh = df[macdh_column]
+        macd = df[macd_column]
 
         # Generate signal
         long_condition = (bbp < self.config.bb_long_threshold) & (macdh > 0) & (macd < 0)

@@ -128,7 +128,10 @@ class OptimizationResultsManager:
                 continue
             with result_file.open("r", encoding="utf-8") as file:
                 payload = json.load(file)
-            return OptimizationResult.model_validate(payload)
+            result = OptimizationResult.model_validate(payload)
+            if not result.output_dir:
+                result.output_dir = str(result_dir)
+            return result
         return None
 
     def _build_output_dir(self, study_name: str, created_at: datetime) -> Path:
@@ -190,6 +193,8 @@ class OptimizationResultsManager:
         sanitized_df = trials_df.copy()
         for column in sanitized_df.columns:
             sanitized_df[column] = sanitized_df[column].map(self._sanitize_dataframe_value)
+            if sanitized_df[column].dtype == "object":
+                sanitized_df[column] = sanitized_df[column].fillna("").map(lambda value: value if isinstance(value, str) else str(value))
         sanitized_df.to_parquet(output_file, index=False)
 
     def _write_report_html(
@@ -230,10 +235,21 @@ class OptimizationResultsManager:
             }
             for trial in result.top_k_trials
         ]
-        summary_table = pd.DataFrame(summary_rows).to_html(index=False, classes="summary-table")
+        summary_df = pd.DataFrame(summary_rows)
+        if not summary_df.empty:
+            for column in summary_df.columns:
+                summary_df[column] = summary_df[column].map(self._sanitize_dataframe_value)
+            summary_df = summary_df.where(pd.notna(summary_df), "").astype(str)
+        summary_table = summary_df.to_html(index=False, classes="summary-table")
+
+        trials_preview_df = trials_df.head(25).copy()
+        if not trials_preview_df.empty:
+            for column in trials_preview_df.columns:
+                trials_preview_df[column] = trials_preview_df[column].map(self._sanitize_dataframe_value)
+            trials_preview_df = trials_preview_df.where(pd.notna(trials_preview_df), "").astype(str)
         trials_preview = (
-            trials_df.head(25).to_html(index=False, classes="trials-table")
-            if not trials_df.empty
+            trials_preview_df.to_html(index=False, classes="trials-table")
+            if not trials_preview_df.empty
             else "<p>No trials available.</p>"
         )
 
