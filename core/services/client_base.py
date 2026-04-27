@@ -1,7 +1,10 @@
+import logging
 from typing import Dict, Optional
 
 import aiohttp
 from aiohttp import ClientResponse
+
+logger = logging.getLogger(__name__)
 
 
 class ClientBase:
@@ -50,15 +53,14 @@ class ClientBase:
     async def _process_response(response):
         if response.status >= 400:
             text = await response.text()
-            print(f"Error: {response.status} - {text}")
+            logger.debug("HTTP %s from %s: %s", response.status, response.url, text)
             return {"error": text, "status": response.status}
         content_type = response.headers.get('Content-Type', '')
         if 'application/json' in content_type:
             return await response.json()
         else:
             text = await response.text()
-            print(f"Warning: Unexpected content type: {content_type}")
-            print(f"Response text: {text}")
+            logger.debug("Unexpected content type from %s: %s | %s", response.url, content_type, text)
             return {"content": text, "content_type": content_type}
 
     async def close(self):

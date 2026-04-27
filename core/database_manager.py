@@ -22,12 +22,12 @@ class DatabaseManager:
         configured_backend = os.getenv("QUANTS_LAB_STORAGE", "").strip().lower()
         if configured_backend:
             return configured_backend
-        return "mongodb" if os.getenv("MONGO_URI") else "sqlite"
+        return "sqlite"
 
-    async def get_mongodb_client(self) -> Optional[MongoClient]:
+    async def get_mongodb_client(self, force: bool = False) -> Optional[MongoClient]:
         """Get MongoDB client instance when MongoDB storage is enabled."""
-        if self.get_storage_backend() != "mongodb":
-            logger.info("MongoDB client skipped because QUANTS_LAB_STORAGE is not set to 'mongodb'")
+        if not force and self.get_storage_backend() != "mongodb":
+            logger.debug("MongoDB client skipped because QUANTS_LAB_STORAGE is not set to 'mongodb'")
             return None
 
         if self._mongodb_client is None:

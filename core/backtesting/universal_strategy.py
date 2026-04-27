@@ -24,6 +24,7 @@ from core.services.hummingbot_api_client import HummingbotAPIClient
 class StudyConfig(BaseModel):
     name: str
     controller: str
+    controller_type: Optional[str] = None
     n_trials: int = 50
     direction: str = "maximize"
     objective: str = "sharpe_ratio"
@@ -178,10 +179,19 @@ class UniversalStrategyConfigGenerator(BaseStrategyConfigGenerator):
         return params
 
     def build_controller_config_data(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        controller_info = None
+        if self.optimization_config.study.controller_type:
+            controller_type = self.optimization_config.study.controller_type
+        else:
+            controller_info = self.backtesting_engine.resolve_controller_info(self.optimization_config.study.controller)
+            controller_type = controller_info["controller_type"] if controller_info else None
+
         config_data = {
             "controller_name": self.optimization_config.study.controller,
             **params,
         }
+        if controller_type:
+            config_data["controller_type"] = controller_type
 
         config_data.setdefault("connector_name", self.optimization_config.data.connector)
         if "trading_pair" not in config_data:
@@ -192,6 +202,12 @@ class UniversalStrategyConfigGenerator(BaseStrategyConfigGenerator):
             config_data["candles_connector"] = self.optimization_config.data.connector
         if "candles_trading_pair" not in config_data and "trading_pair" in config_data:
             config_data["candles_trading_pair"] = config_data["trading_pair"]
+
+        if "controller_type" not in config_data:
+            raise ValueError(
+                f"Unable to resolve controller_type for controller '{self.optimization_config.study.controller}'. "
+                "Set study.controller_type explicitly or ensure the controller exists under app/controllers."
+            )
         return config_data
 
     def build_controller_config(self, params: Dict[str, Any]):

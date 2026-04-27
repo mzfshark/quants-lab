@@ -1,5 +1,7 @@
+import hashlib
 import logging
 import os
+import re
 from typing import Dict, Optional
 
 import pandas as pd
@@ -105,12 +107,88 @@ class BacktestingEngine:
                 candidates.append(candidate)
         return candidates
 
+    def _get_controller_roots(self) -> list[tuple[str, "Path"]]:
+        from pathlib import Path
+
+        roots: list[tuple[str, Path]] = []
+        for module_name in self._get_controller_module_candidates():
+            root_path = data_paths.base_path / Path(*module_name.split("."))
+            if root_path.exists():
+                roots.append((module_name, root_path))
+        return roots
+
+    def list_available_controllers(self) -> list[Dict[str, str]]:
+        controller_name_pattern = re.compile(r'controller_name:\s*str\s*=\s*"([^"]+)"')
+        discovered: list[Dict[str, str]] = []
+        seen_keys: set[tuple[str, str]] = set()
+
+        for module_name, root_path in self._get_controller_roots():
+            for file_path in sorted(root_path.rglob("*.py")):
+                if file_path.name == "__init__.py":
+                    continue
+                relative_path = file_path.relative_to(root_path)
+                if len(relative_path.parts) < 2:
+                    continue
+                controller_type = relative_path.parts[0]
+                module_parts = file_path.relative_to(data_paths.base_path).with_suffix("").parts
+                module_path = ".".join(module_parts)
+                try:
+                    content = file_path.read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    content = file_path.read_text(encoding="latin-1")
+                match = controller_name_pattern.search(content)
+                controller_name = match.group(1) if match else file_path.stem
+                key = (controller_type, controller_name)
+                if key in seen_keys:
+                    continue
+                seen_keys.add(key)
+                discovered.append(
+                    {
+                        "controller_type": controller_type,
+                        "controller_name": controller_name,
+                        "module_path": module_path,
+                        "file_path": str(file_path),
+                        "controllers_module": module_name,
+                    }
+                )
+        discovered.sort(key=lambda item: (item["controller_type"], item["controller_name"]))
+        return discovered
+
+    def resolve_controller_info(self, controller_name: str) -> Optional[Dict[str, str]]:
+        matches = [
+            controller
+            for controller in self.list_available_controllers()
+            if controller["controller_name"] == controller_name
+        ]
+        if len(matches) == 1:
+            return matches[0]
+        return None
+
+    @staticmethod
+    def _build_controller_id(config_data: Dict) -> str:
+        controller_name = str(config_data.get("controller_name", "controller")).strip() or "controller"
+        trading_pair = str(config_data.get("trading_pair", "market")).strip() or "market"
+        raw_payload = repr(sorted((key, str(value)) for key, value in config_data.items() if key != "id"))
+        digest = hashlib.sha1(raw_payload.encode("utf-8")).hexdigest()[:10]
+        safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", controller_name).strip("_") or "controller"
+        safe_pair = re.sub(r"[^A-Za-z0-9._-]+", "_", trading_pair).strip("_") or "market"
+        return f"{safe_name}_{safe_pair}_{digest}"
+
     def get_controller_config_instance_from_dict(self, config: Dict):
+        config_data = dict(config)
+        controller_name = config_data.get("controller_name")
+        if controller_name and not config_data.get("controller_type"):
+            controller_info = self.resolve_controller_info(controller_name)
+            if controller_info is not None:
+                config_data["controller_type"] = controller_info["controller_type"]
+        if controller_name and not config_data.get("id"):
+            config_data["id"] = self._build_controller_id(config_data)
+
         last_error = None
         for controllers_module in self._get_controller_module_candidates():
             try:
                 return BacktestingEngineBase.get_controller_config_instance_from_dict(
-                    config_data=config,
+                    config_data=config_data,
                     controllers_module=controllers_module,
                 )
             except ModuleNotFoundError as e:
@@ -118,7 +196,7 @@ class BacktestingEngine:
                 logger.debug(
                     "Controller lookup failed for module %s and controller %s",
                     controllers_module,
-                    config.get("controller_name"),
+                    config_data.get("controller_name"),
                 )
         if last_error is not None:
             raise last_error

@@ -1,6 +1,7 @@
 study:
   name: "macd_bb_btc_q2_2026"
   controller: "macd_bb_v1"
+  controller_type: "directional_trading"
   n_trials: 25
   direction: maximize
   objective: sharpe_ratio

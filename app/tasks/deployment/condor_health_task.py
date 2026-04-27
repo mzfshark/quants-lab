@@ -19,7 +19,9 @@ class CondorHealthTask(BaseTask):
     def __init__(self, config):
         super().__init__(config)
         task_config = self.config.config
-        self.hummingbot_server = task_config.get("hummingbot_api_url") or task_config.get("hummingbot_host", "localhost")
+        self.hummingbot_server = self._coerce_host(task_config.get("hummingbot_api_url")) or self._coerce_host(
+            task_config.get("hummingbot_host")
+        ) or "localhost"
         self.hummingbot_port = int(task_config.get("hummingbot_port", 8000))
         self.hummingbot_username = task_config.get("hummingbot_username")
         self.hummingbot_password = task_config.get("hummingbot_password")
@@ -52,7 +54,11 @@ class CondorHealthTask(BaseTask):
 
     async def execute(self, context: TaskContext) -> Dict[str, Any]:
         started_at = datetime.now(timezone.utc)
-        snapshot = await self.api_client.get_runtime_snapshot() if self.api_client is not None else self._offline_snapshot()
+        try:
+            snapshot = await self.api_client.get_runtime_snapshot() if self.api_client is not None else self._offline_snapshot()
+        except Exception as exc:
+            logger.warning(f"Unable to reach Hummingbot API during health check: {exc}")
+            snapshot = self._offline_snapshot()
         alerts = self._build_alerts(snapshot)
         output_file = await self._store_report(context, snapshot, alerts, started_at)
         notification_sent = await self._send_notification_if_needed(snapshot, alerts)
@@ -178,3 +184,12 @@ class CondorHealthTask(BaseTask):
             return float(value)
         except (TypeError, ValueError):
             return None
+
+    @staticmethod
+    def _coerce_host(value: Any) -> Optional[str]:
+        if value is None:
+            return None
+        host = str(value).strip()
+        if not host or (host.startswith("${") and host.endswith("}")):
+            return None
+        return host

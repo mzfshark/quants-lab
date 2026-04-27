@@ -70,15 +70,34 @@ class TaskRunner:
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
 
+    def _get_storage_config(self) -> Dict[str, Any]:
+        storage_config = self.config.get("storage", {})
+        return storage_config if isinstance(storage_config, dict) else {}
+
+    def _resolve_storage_backend(self) -> str:
+        storage_config = self._get_storage_config()
+        configured_backend = os.getenv("QUANTS_LAB_STORAGE", "").strip().lower() or storage_config.get("type")
+        return get_storage_backend(configured_backend)
+
     def _log_storage_configuration(self) -> None:
-        backend = get_storage_backend()
+        storage_config = self._get_storage_config()
+        backend = self._resolve_storage_backend()
         logger.info("=== Task Storage Configuration ===")
         logger.info(f"Backend: {backend}")
+        if storage_config:
+            logger.info(f"Config storage.type: {storage_config.get('type', 'unset')}")
+        if os.getenv("QUANTS_LAB_STORAGE"):
+            logger.info(f"Env QUANTS_LAB_STORAGE: {os.getenv('QUANTS_LAB_STORAGE')}")
         if backend == "mongodb":
             logger.info(f"MONGO_URI: {'Configured' if os.getenv('MONGO_URI') else 'Not configured'}")
             logger.info(f"MONGO_DATABASE: {os.getenv('MONGO_DATABASE', 'quants_lab')}")
         else:
-            sqlite_path = os.getenv("QUANTS_LAB_SQLITE_PATH") or str(data_paths.processed_dir / "task_storage.db")
+            sqlite_path = (
+                storage_config.get("sqlite_path")
+                or storage_config.get("path")
+                or os.getenv("QUANTS_LAB_SQLITE_PATH")
+                or str(data_paths.processed_dir / "task_storage.db")
+            )
             logger.info(f"SQLite path: {sqlite_path}")
         logger.info("==================================")
 
@@ -156,7 +175,11 @@ class TaskRunner:
         logger.info("Starting QuantsLab Task Runner v2.0")
         try:
             self._log_storage_configuration()
-            storage = create_task_storage()
+            storage_config = self._get_storage_config()
+            storage = create_task_storage(
+                storage_backend=self._resolve_storage_backend(),
+                storage_config=storage_config,
+            )
             self.orchestrator = TaskOrchestrator(
                 storage=storage,
                 max_concurrent_tasks=self.config.get("max_concurrent_tasks", 10),

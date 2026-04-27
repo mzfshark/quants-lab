@@ -34,6 +34,26 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+compose_services() {
+    $COMPOSE -f docker-compose-db.yml config --services 2>/dev/null || true
+}
+
+compose_has_service() {
+    compose_services | grep -qx "$1"
+}
+
+get_configured_mongo_uri() {
+    if [ -n "$MONGO_URI" ]; then
+        echo "$MONGO_URI"
+        return 0
+    fi
+    if [ -f .env ]; then
+        grep -E '^MONGO_URI=' .env | tail -1 | cut -d= -f2-
+        return 0
+    fi
+    echo ""
+}
+
 # Detect user's shell for conda activation
 detect_shell() {
     if [ -n "$SHELL" ]; then
@@ -125,34 +145,65 @@ install_package() {
 # Setup databases
 setup_databases() {
     log_info "Setting up databases..."
-    
-    read -p "Do you want to start the databases (MongoDB only) now? (Y/n): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        log_info "Starting databases with Docker Compose..."
-        
-        if $COMPOSE -f docker-compose-db.yml ps | grep -q "Up"; then
-            log_warning "Some database containers are already running."
-            read -p "Do you want to restart them? (y/N): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                $COMPOSE -f docker-compose-db.yml down
-                $COMPOSE -f docker-compose-db.yml up -d
-                DATABASES_STARTED=true
-            else
-                DATABASES_STARTED=true
+
+    local configured_mongo_uri
+    configured_mongo_uri=$(get_configured_mongo_uri)
+
+    echo "Choose how QuantsLab should handle MongoDB:"
+    echo "  1) Start Docker services from docker-compose-db.yml"
+    echo "  2) Use an existing MongoDB service"
+    echo "  3) Skip database setup for now"
+    if [ -n "$configured_mongo_uri" ]; then
+        log_info "Current configured MONGO_URI: $configured_mongo_uri"
+        read -p "Selection [1/2/3] (default: 2): " DB_SETUP_CHOICE
+        DB_SETUP_CHOICE=${DB_SETUP_CHOICE:-2}
+    else
+        read -p "Selection [1/2/3] (default: 1): " DB_SETUP_CHOICE
+        DB_SETUP_CHOICE=${DB_SETUP_CHOICE:-1}
+    fi
+
+    case "$DB_SETUP_CHOICE" in
+        1)
+            log_info "Starting Docker services from docker-compose-db.yml..."
+            if $COMPOSE -f docker-compose-db.yml ps | grep -q "Up"; then
+                log_warning "Some database-related containers are already running."
+                read -p "Do you want to restart them? (y/N): " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    $COMPOSE -f docker-compose-db.yml down
+                fi
             fi
-        else
             $COMPOSE -f docker-compose-db.yml up -d
             DATABASES_STARTED=true
-        fi
-        
-        log_success "Databases started successfully!"
-        log_info "MongoDB connection: mongodb://admin:admin@localhost:27017/quants_lab"
-    else
-        log_warning "Databases not started. You can start them later with: make run-db"
-        DATABASES_STARTED=false
-    fi
+            DB_SETUP_MODE="docker"
+            log_success "Docker database stack started successfully!"
+            log_info "Review docker-compose-db.yml and .env if your MongoDB host/port differ from the defaults."
+            ;;
+        2)
+            DATABASES_STARTED=false
+            DB_SETUP_MODE="existing"
+            log_info "Using an existing MongoDB service."
+            log_info "Make sure .env points to the correct service via MONGO_URI and MONGO_DATABASE."
+            if compose_has_service "mongo-express"; then
+                read -p "Do you want to start only mongo-express as a helper UI? (Y/n): " -n 1 -r
+                echo
+                if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                    $COMPOSE -f docker-compose-db.yml up -d mongo-express
+                    DATABASES_STARTED=true
+                    log_success "mongo-express started successfully!"
+                fi
+            fi
+            ;;
+        3)
+            DATABASES_STARTED=false
+            DB_SETUP_MODE="skip"
+            log_warning "Database setup skipped. You can configure it later via .env and make run-db."
+            ;;
+        *)
+            log_error "Invalid selection: $DB_SETUP_CHOICE"
+            exit 1
+            ;;
+    esac
 }
 
 # Test installation
@@ -265,9 +316,9 @@ main() {
     
     check_prerequisites
     setup_conda_environment
+    create_env_file
     install_package
     setup_databases
-    create_env_file
     test_installation
     
     echo
@@ -277,12 +328,14 @@ main() {
     log_info "  1. Activate the environment: conda activate quants-lab"
     log_info "  2. Test the CLI: python cli.py --help"
     log_info "  3. List available tasks: python cli.py list-tasks"
-    log_info "  4. Start Jupyter: jupyter lab"
-    log_info "  5. Check the README.md for detailed usage instructions"
+    log_info "  4. Start the API for human access: python cli.py serve --config config/tf_pipeline.yml --port 8000"
+    log_info "  5. Open FastAPI docs: http://localhost:8000/docs"
+    log_info "  6. Start Jupyter if needed: jupyter lab"
+    log_info "  7. Check the README.md for detailed usage instructions"
     echo
     log_info "Database access:"
-    log_info "  MongoDB UI: http://localhost:28081/ (admin/changeme)"
-    log_info "  Config file: config/database.yml"
+    log_info "  MongoDB config: .env (MONGO_URI, MONGO_DATABASE)"
+    log_info "  MongoDB helper UI: http://localhost:28081/ (admin/changeme) if mongo-express is running"
     echo
     log_success "Happy coding! 🚀"
 }

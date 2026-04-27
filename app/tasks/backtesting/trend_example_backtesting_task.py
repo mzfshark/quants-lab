@@ -5,7 +5,6 @@ from decimal import Decimal
 from typing import Any, Dict
 
 from dotenv import load_dotenv
-from hummingbot.strategy_v2.backtesting import DirectionalTradingBacktesting
 from hummingbot.strategy_v2.executors.position_executor.data_types import TrailingStop
 
 from app.controllers.directional_trading.trend_example import TrendExampleControllerConfig
@@ -36,6 +35,7 @@ class TrendExampleConfigGenerator(BaseStrategyConfigGenerator):
         cooldown_time = 60 * 15
 
         config = TrendExampleControllerConfig(
+            id=f"trend_example_{self.config['trading_pair'].replace('-', '_')}_{trial.number}",
             connector_name=self.config["connector_name"],
             trading_pair=self.config["trading_pair"],
             interval=interval,
@@ -86,7 +86,6 @@ class TrendExampleBacktestingTask(BaseTask):
             self.optimizer = StrategyOptimizer(
                 resolution=self.resolution,
                 load_cached_data=True,
-                custom_backtester=DirectionalTradingBacktesting(),
             )
 
             logging.info(f"Setup completed for {context.task_name}")

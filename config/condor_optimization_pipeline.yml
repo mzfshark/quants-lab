@@ -13,10 +13,12 @@ tasks:
     config:
       connector_name: binance_perpetual
       quote_asset: USDT
+      pairs_from_optimization_configs:
+        - config/optimize_macd_bb.yml
       intervals:
         - 15m
         - 1h
-      days_data_retention: 90
+      days_data_retention: 60
 
   strategy_optimizer:
     enabled: true

@@ -30,6 +30,36 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _missing_dependency_message(exc: ModuleNotFoundError) -> str:
+    dependency = exc.name or "unknown"
+    argv = sys.argv[:] if sys.argv else ["cli.py"]
+    invoked_as = " ".join(argv)
+    if argv[0].endswith(".py"):
+        invoked_as = f"python {invoked_as}"
+    lines = [
+        f"Missing Python dependency: {dependency}",
+        "",
+        "Quants-Lab is probably running outside the 'quants-lab' Conda environment.",
+        "Do not install packages into the system Python for this project.",
+        "",
+        "Use one of these commands instead:",
+        "  conda activate quants-lab",
+        f"  {invoked_as}",
+        "",
+        "Or run it without activating first:",
+        f"  conda run -n quants-lab {invoked_as}",
+    ]
+    if dependency == "pydantic":
+        lines.extend(
+            [
+                "",
+                "Tip: the error you saw is consistent with calling the OS Python",
+                "instead of the environment created by `make install`.",
+            ]
+        )
+    return "\n".join(lines)
+
+
 def _normalize_config_path(config_path: str) -> str:
     if not config_path.startswith("config/") and not os.path.isabs(config_path):
         return f"config/{config_path}"
@@ -103,7 +133,7 @@ Examples:
     direct_parser.add_argument("task_path", help="Task module path (e.g., app.tasks.data_collection.pools_screener)")
     direct_parser.add_argument("--timeout", type=int, default=600, help="Task timeout in seconds")
 
-    serve_parser = subparsers.add_parser("serve", help="Start API server with background tasks")
+    serve_parser = subparsers.add_parser("serve", help="Start API server, optionally without background tasks")
     serve_parser.add_argument(
         "--config",
         "-c",
@@ -112,6 +142,11 @@ Examples:
     )
     serve_parser.add_argument("--port", "-p", type=int, default=8000, help="API server port")
     serve_parser.add_argument("--host", default="0.0.0.0", help="API server host")
+    serve_parser.add_argument(
+        "--api-only",
+        action="store_true",
+        help="Start only the FastAPI service without running background tasks",
+    )
 
     list_parser = subparsers.add_parser("list-tasks", help="List available tasks")
     list_parser.add_argument(
@@ -247,7 +282,9 @@ async def trigger_task(task_name: str, config_path: str, timeout: int):
         from core.tasks.orchestrator import TaskOrchestrator
         from core.tasks.storage import create_task_storage
 
-        storage = create_task_storage()
+        storage_config = runner.config.get("storage", {}) if isinstance(runner.config.get("storage", {}), dict) else {}
+        resolved_backend = os.getenv("QUANTS_LAB_STORAGE", "").strip().lower() or storage_config.get("type")
+        storage = create_task_storage(storage_backend=resolved_backend, storage_config=storage_config)
         max_concurrent = runner.config.get("max_concurrent_tasks", 10)
         runner.orchestrator = TaskOrchestrator(
             storage=storage,
@@ -275,17 +312,31 @@ async def trigger_task(task_name: str, config_path: str, timeout: int):
         sys.exit(1)
 
 
-async def serve_api(config_path: str, host: str, port: int):
-    """Start API server with background tasks."""
-    from core.tasks.runner import TaskRunner
-
+async def serve_api(config_path: str, host: str, port: int, api_only: bool = False):
+    """Start API server with optional background task orchestration."""
     config_path = _normalize_config_path(config_path)
 
     logger.info("Starting QuantsLab API Server")
-    logger.info(f"Config: {config_path}")
     logger.info(f"Server: http://{host}:{port}")
+    if api_only:
+        logger.info("Mode: api-only")
+    else:
+        logger.info(f"Config: {config_path}")
 
     try:
+        if api_only:
+            import uvicorn
+
+            from core.tasks.api import app
+
+            server = uvicorn.Server(
+                uvicorn.Config(app, host=host, port=port, log_level="info", loop="asyncio")
+            )
+            await server.serve()
+            return
+
+        from core.tasks.runner import TaskRunner
+
         runner = TaskRunner(config_path=config_path, enable_api=True)
         runner.api_host = host
         runner.api_port = port
@@ -722,7 +773,7 @@ async def async_main():
     elif args.command == "run":
         await run_task_direct(args.task_path, args.timeout)
     elif args.command == "serve":
-        await serve_api(args.config, args.host, args.port)
+        await serve_api(args.config, args.host, args.port, api_only=args.api_only)
     elif args.command == "list-tasks":
         list_tasks(args.config)
     elif args.command == "validate-config":
@@ -776,7 +827,13 @@ async def async_main():
 
 
 def main():
-    asyncio.run(async_main())
+    try:
+        asyncio.run(async_main())
+    except KeyboardInterrupt:
+        logger.info("Shutdown requested.")
+    except ModuleNotFoundError as exc:
+        logger.error(_missing_dependency_message(exc))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

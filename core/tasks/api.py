@@ -6,9 +6,10 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional
 
 from fastapi import FastAPI, HTTPException, Depends, Query, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
+from core.api.router import router as strategy_engine_router
 from core.tasks.orchestrator import TaskOrchestrator
 from core.tasks.base import TaskStatus, TaskContext
 import uuid
@@ -21,6 +22,7 @@ app = FastAPI(
     description="API for managing and triggering trading tasks",
     version="2.0.0"
 )
+app.include_router(strategy_engine_router)
 
 # Global orchestrator instance (will be set by TaskRunner)
 orchestrator: Optional[TaskOrchestrator] = None
@@ -122,6 +124,11 @@ async def _execute_task_background(
 
 
 # Health check endpoint
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    return RedirectResponse(url="/docs", status_code=307)
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""

@@ -180,6 +180,10 @@ class HummingbotAPIClient(ClientBase):
                 return False
         return True
 
+    @classmethod
+    def is_error_payload(cls, payload: Any) -> bool:
+        return isinstance(payload, dict) and not cls.is_success_response(payload)
+
     @staticmethod
     def unwrap_data(payload: Any) -> Any:
         if not isinstance(payload, dict):
@@ -488,6 +492,8 @@ class HummingbotAPIClient(ClientBase):
 
     @classmethod
     def normalize_named_map(cls, payload: Any) -> Dict[str, Any]:
+        if cls.is_error_payload(payload):
+            return {}
         data = cls.unwrap_data(payload)
         if isinstance(data, dict):
             if "bots" in data and isinstance(data["bots"], dict):
@@ -505,6 +511,8 @@ class HummingbotAPIClient(ClientBase):
 
     @classmethod
     def normalize_bot_entries(cls, payload: Any) -> List[Dict[str, Any]]:
+        if cls.is_error_payload(payload):
+            return []
         data = cls.unwrap_data(payload)
         if isinstance(data, dict) and "bots" in data and data["bots"] is not None:
             data = data["bots"]
@@ -522,6 +530,8 @@ class HummingbotAPIClient(ClientBase):
 
     @classmethod
     def normalize_balance_entries(cls, payload: Any) -> List[Dict[str, Any]]:
+        if cls.is_error_payload(payload):
+            return []
         data = cls.unwrap_data(payload)
         if isinstance(data, dict):
             for key in ("balances", "assets", "tokens", "holdings"):
@@ -617,6 +627,8 @@ class HummingbotAPIClient(ClientBase):
         balances: List[Dict[str, Any]],
     ) -> Optional[float]:
         for payload in (performance_payload, balances_payload):
+            if cls.is_error_payload(payload):
+                continue
             data = cls.unwrap_data(payload)
             if isinstance(data, dict):
                 for key in ("portfolio_value", "total_value", "total_value_usd", "nav", "equity", "usd_value", "value"):

@@ -54,7 +54,7 @@ clean-db:  ## Stop databases and remove volumes (⚠️  DATA LOSS)
 run-tasks:  ## Run tasks continuously (Docker or local with source=1)
 ifeq ($(source),1)
 	@echo "▶️  Running tasks locally: $(config)"
-	python cli.py run-tasks --config config/$(config)
+	conda run --no-capture-output -n quants-lab python cli.py run-tasks --config config/$(config)
 else
 	@echo "🐳 Running tasks in Docker: $(config)"
 	@docker run -d --rm \
@@ -75,7 +75,7 @@ endif
 trigger-task:  ## Run a single task once (Docker or local with source=1)
 ifeq ($(source),1)
 	@echo "⚡ Triggering task locally: $(task)"
-	python cli.py trigger-task --task $(task) --config config/$(config)
+	conda run --no-capture-output -n quants-lab python cli.py trigger-task --task $(task) --config config/$(config)
 else
 	@echo "🐳 Triggering task in Docker: $(task)"
 	docker run --rm \
@@ -92,7 +92,7 @@ endif
 serve-api:  ## Start API server with background tasks
 ifeq ($(source),1)
 	@echo "🌐 Starting API server locally on port $(port)"
-	python cli.py serve --config config/$(config) --port $(port)
+	conda run --no-capture-output -n quants-lab python cli.py serve --config config/$(config) --port $(port)
 else
 	@echo "🐳 Starting API server in Docker on port $(port)"
 	docker run -d --rm \
@@ -111,7 +111,7 @@ endif
 
 list-tasks:  ## List all tasks from config file
 ifeq ($(source),1)
-	@python cli.py list-tasks --config config/$(config)
+	@conda run --no-capture-output -n quants-lab python cli.py list-tasks --config config/$(config)
 else
 	@docker run --rm \
 		-v $(shell pwd)/config:/quants-lab/config \
@@ -122,7 +122,7 @@ endif
 
 validate-config:  ## Validate task configuration file
 ifeq ($(source),1)
-	@python cli.py validate-config --config config/$(config)
+	@conda run --no-capture-output -n quants-lab python cli.py validate-config --config config/$(config)
 else
 	@docker run --rm \
 		-v $(shell pwd)/config:/quants-lab/config \
@@ -149,11 +149,11 @@ ps-tasks:  ## List running task containers
 
 launch-optuna:  ## Launch Optuna dashboard for hyperparameter optimization
 	@echo "📊 Launching Optuna dashboard..."
-	python -c "from core.backtesting.optimizer import StrategyOptimizer; optimizer = StrategyOptimizer(); optimizer.launch_optuna_dashboard()"
+	conda run --no-capture-output -n quants-lab python -c "from core.backtesting.optimizer import StrategyOptimizer; optimizer = StrategyOptimizer(); optimizer.launch_optuna_dashboard()"
 
 kill-optuna:  ## Stop Optuna dashboard
 	@echo "🛑 Stopping Optuna dashboard..."
-	python -c "from core.backtesting.optimizer import StrategyOptimizer; optimizer = StrategyOptimizer(); optimizer.kill_optuna_dashboard()"
+	conda run --no-capture-output -n quants-lab python -c "from core.backtesting.optimizer import StrategyOptimizer; optimizer = StrategyOptimizer(); optimizer.kill_optuna_dashboard()"
 
 # ============================================================================
 # MAINTENANCE & CLEANUP
@@ -161,10 +161,10 @@ kill-optuna:  ## Stop Optuna dashboard
 
 cleanup-tasks:  ## Clean up stale task states in MongoDB
 	@echo "🧹 Cleaning up stale tasks..."
-	python scripts/cleanup_tasks.py
+	conda run --no-capture-output -n quants-lab python scripts/cleanup_tasks.py
 
 list-task-states:  ## List current task states in MongoDB
-	@python scripts/cleanup_tasks.py --list
+	@conda run --no-capture-output -n quants-lab python scripts/cleanup_tasks.py --list
 
 clean:  ## Remove Python cache and build artifacts
 	@echo "🧹 Cleaning Python cache and build artifacts..."

@@ -132,7 +132,7 @@ class MongoDBTaskStorage(TaskStorage):
 
         from core.database_manager import db_manager
 
-        mongodb_client = await db_manager.get_mongodb_client()
+        mongodb_client = await db_manager.get_mongodb_client(force=True)
         if mongodb_client is None:
             raise RuntimeError(
                 "Failed to get MongoDB client from database manager. "
@@ -520,8 +520,13 @@ def get_storage_backend(storage_backend: Optional[str] = None) -> str:
     return backend
 
 
-def create_task_storage(storage_backend: Optional[str] = None) -> TaskStorage:
-    backend = get_storage_backend(storage_backend)
+def create_task_storage(
+    storage_backend: Optional[str] = None,
+    storage_config: Optional[Dict[str, Any]] = None,
+) -> TaskStorage:
+    config = storage_config or {}
+    backend = get_storage_backend(storage_backend or config.get("type"))
     if backend == "mongodb":
         return MongoDBTaskStorage()
-    return SQLiteTaskStorage()
+    sqlite_path = config.get("sqlite_path") or config.get("path")
+    return SQLiteTaskStorage(db_path=sqlite_path)

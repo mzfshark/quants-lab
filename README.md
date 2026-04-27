@@ -15,7 +15,7 @@ make install
 The installer sets up:
 - Conda environment (Python 3.12)
 - All dependencies
-- MongoDB database
+- Database configuration and optional Docker helpers
 - Configuration files
 
 ### Deploy a Recurring Task
@@ -53,7 +53,7 @@ Type `make` or `make help` to see all commands.
 - `make uninstall` - Remove environment
 
 **Database:**
-- `make run-db` - Start MongoDB
+- `make run-db` - Start services from `docker-compose-db.yml`
 - `make stop-db` - Stop MongoDB
 - Mongo Express UI: http://localhost:28081 (admin/changeme)
 
@@ -68,6 +68,37 @@ Type `make` or `make help` to see all commands.
 **Configuration:**
 - `make list-tasks config=FILE.yml` - List available tasks
 - `make validate-config config=FILE.yml` - Validate config
+
+## Human Access Today
+
+Quants-Lab does not ship with a dedicated product-style web dashboard yet. The current human-facing entry points are:
+
+- **CLI**: `python cli.py --help`
+- **FastAPI control plane**: `python cli.py serve --config config/tf_pipeline.yml --port 8000`
+- **Swagger UI**: http://localhost:8000/docs
+- **Jupyter Lab**: `jupyter lab`
+- **Optuna Dashboard**: `make launch-optuna`
+- **Generated HTML reports**: optimization runs write `report.html` into `app/outputs/...`
+- **Mongo Express**: optional helper UI for MongoDB
+
+So yes, there is already a lightweight web-access path via FastAPI `/docs`, but there is not yet a dedicated operations dashboard for strategies, approvals, reports, and deployments.
+
+## Can It Be Extended To A Real Web UI?
+
+Yes. The current architecture is already a good base for that because it has:
+
+- a **FastAPI backend** in `core/tasks/api.py`
+- persisted **optimization artifacts** in `app/outputs/`
+- persisted **approval/deployment state**
+- a task orchestrator and API clients that already separate backend logic from presentation
+
+The natural next step is a small web app that sits on top of the FastAPI layer and exposes:
+
+- task status and trigger controls
+- optimization studies and HTML reports
+- Condor export/deploy history
+- approval queue for manual human review
+- bot/runtime health snapshots
 
 ## Architecture
 
@@ -144,6 +175,8 @@ make run-db
 docker ps  # Verify containers running
 ```
 
+If you already run MongoDB elsewhere, point `.env` to that service with `MONGO_URI` and use `docker-compose-db.yml` only for helper services like `mongo-express`.
+
 **Task failures:**
 ```bash
 make logs-tasks  # View logs
@@ -151,7 +184,7 @@ make validate-config config=YOUR_CONFIG.yml
 ```
 
 **Port conflicts:**
-Edit `docker-compose-db.yml` if port 27017 or 28081 are in use.
+Edit `docker-compose-db.yml` if a local MongoDB or helper UI port is already in use.
 
 ## Support
 

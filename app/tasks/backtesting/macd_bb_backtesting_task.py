@@ -39,6 +39,7 @@ class MACDBBConfigGenerator(BaseStrategyConfigGenerator):
         cooldown_time = 60 * 15
 
         config = MACDBBV1ControllerConfig(
+            id=f"macd_bb_v1_{self.config['trading_pair'].replace('-', '_')}_{trial.number}",
             connector_name=self.config["connector_name"],
             trading_pair=self.config["trading_pair"],
             candles_connector=self.config["connector_name"],
