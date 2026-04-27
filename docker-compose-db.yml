@@ -1,22 +1,9 @@
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: quants_lab
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data_ql:/data/db
-    restart: unless-stopped
-
   mongo-express:
     image: mongo-express:latest
     container_name: mongo-express
     environment:
-      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_SERVER: axodus-mongo
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: admin
@@ -24,9 +11,10 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: changeme
     ports:
       - "28081:8081"
-    depends_on:
-      - mongodb
+    networks:
+      - quants-lab-network
     restart: unless-stopped
 
-volumes:
-  mongodb_data_ql:
+networks:
+  quants-lab-network:
+    driver: bridge
